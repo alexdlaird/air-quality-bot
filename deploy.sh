@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm Wildfire*.zip
+rm Wildfire_*.zip
 
 zip -X -r -j Wildfire_aqi_GET.zip lambdas/aqi_GET/*
 aws lambda update-function-code --function-name Wildfire_aqi_GET --zip-file fileb://Wildfire_aqi_GET.zip
