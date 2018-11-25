@@ -39,7 +39,7 @@ Install and configure the [AWS CLI](https://docs.aws.amazon.com/lambda/latest/dg
 
 ### AWS Lambdas
 
-Create the following Lambdas using the Role created above:
+Create the following Python 3.6 Lambdas using the Role created above:
 
 - `Wildfire_aqi_GET`
 - `Wildfire_evacuation_GET`
