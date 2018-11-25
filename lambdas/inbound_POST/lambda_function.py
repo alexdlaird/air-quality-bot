@@ -6,6 +6,7 @@ from urllib import parse
 from botocore.vendored import requests
 
 WILDFIRE_AQI_API_URL = os.environ.get("WILDFIRE_AQI_API_URL")
+WILDFIRE_FIRE_API_URL = os.environ.get("WILDFIRE_FIRE_API_URL")
 
 AQI_MESSAGES = {
     "Good": "Air quality is considered satisfactory, and air pollution poses little or no risk.",
