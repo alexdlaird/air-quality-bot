@@ -1,5 +1,9 @@
 # Wildfire Bot
 
+The Wilfire Bot is generally available by texting a zip code (415) 212-4229. The bot will respond with information pertaining to wildfires and air quality.
+
+The instructions below illustrate how to similarly setup the bot in your own AWS and Twilio environments.
+
 ## Getting Started
 
 ### AWS Initial Setup
