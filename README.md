@@ -42,8 +42,6 @@ Install and configure the [AWS CLI](https://docs.aws.amazon.com/lambda/latest/dg
 Create the following Lambdas using the Role created above:
 
 - `Wildfire_aqi_GET`
-- `Wildfire_evacuation_GET`
-- `Wildfire_fire_GET`
 - `Wildfire_inbound_POST`
 
 Deploy the Lambdas to your AWS environment using the deploy script:
@@ -64,8 +62,6 @@ For the `Wildfire_aqi_GET` Lambda, add the following environment variables:
 For the `Wildfire_inbound_POST` Lambda, add the following environment variables:
 
 - `WILDFIRE_AQI_API_URL` (this is the `/aqi` endpoint from the API Gateway you'll create below)
-- `WILDFIRE_EVACUATION_API_URL` (this is the `/evacuation` endpoint from the API Gateway you'll create below)
-- `WILDFIRE_FIRE_API_URL` (this is the `/fire` endpoint from the API Gateway you'll create below)
 
 ### AWS API Gateways
 
@@ -78,34 +74,6 @@ Create a new API Gateway in AWS. In the API, do the following:
       - Add a required "URL Query String Parameter" of `zipCode`
 
 Under the "Integration Request" for `/aqi`, under "Mapping Templates" of "Content-Type" of `application/json` with the following template:
-
-```
-{
-    "zipCode":  "$input.params('zipCode')"
-}
-```
-
-- Create a new "Resource" with a path of `/evacuation`
-  - Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_evacuation_GET`
-    - Edit the "GET" method's "Method Request"
-      - Change the "Request Validator" to "Validate query string parameters and header"
-      - Add a required "URL Query String Parameter" of `zipCode`
-
-Under the "Integration Request" for `/evacuation`, under "Mapping Templates" of "Content-Type" of `application/json` with the following template:
-
-```
-{
-    "zipCode":  "$input.params('zipCode')"
-}
-```
-
-- Create a new "Resource" with a path of `/fire`
-  - Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_fire_GET`
-    - Edit the "GET" method's "Method Request"
-      - Change the "Request Validator" to "Validate query string parameters and header"
-      - Add a required "URL Query String Parameter" of `zipCode`
-
-Under the "Integration Request" for `/fire`, under "Mapping Templates" of "Content-Type" of `application/json` with the following template:
 
 ```
 {
