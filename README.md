@@ -20,6 +20,7 @@ Create a new Role from a Policy with the following permissions:
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
+                "cloudwatch:PutMetricData",
                 "dynamodb:CreateTable",
                 "dynamodb:GetItem",
                 "dynamodb:PutItem",
