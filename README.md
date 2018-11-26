@@ -37,7 +37,8 @@ Create a new Role from a Policy with the following permissions:
 }
 ```
 
-Create a DynamoDB table with a partition key of `PartitionKey`.
+Create a DynamoDB table with a partition key of `PartitionKey`. Optionally, enable
+TTL on the table and tell it to use the `TTL` field.
 
 Install and configure the [AWS CLI](https://docs.aws.amazon.com/lambda/latest/dg/setup-awscli.html).
 

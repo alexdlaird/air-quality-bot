@@ -6,7 +6,7 @@ import boto3
 
 from botocore.vendored import requests
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
@@ -42,7 +42,7 @@ def lambda_handler(event, context):
 
         if parameter_name is None:
             data = {
-                "errorMessage": "Oops, something went wrong. AirNow may be unavailable for this zip code."
+                "errorMessage": "Sorry, AirNow data is unavailable for this zip code."
             }
         else:
             data = zip_code_data.copy()
@@ -51,8 +51,10 @@ def lambda_handler(event, context):
 
             if reporting_area_data is not None:
                 # If the ReportingArea's CachedAQI is more recent than the ZipCode value (i.e. the cache is old and a new
-                # request failed), fallback to the ReportArea's cache
-                if parser.parse(reporting_area_data["LastUpdated"]) > parser.parse(zip_code_data["LastUpdated"]) and "CachedAQI" in reporting_area_data:
+                # request failed), fallback to the ReportArea's cache (assuming it isn't more than a day old)
+                if parser.parse(reporting_area_data["LastUpdated"]) > parser.parse(zip_code_data["LastUpdated"]) and \
+                        "CachedAQI" in reporting_area_data and \
+                        parser.parse(reporting_area_data["CachedAQI"]["LastUpdated"]) < utc_dt + timedelta(hours=24):
                     data = reporting_area_data["CachedAQI"]
 
                 data["MapUrl"] = reporting_area_data["MapUrl"]
@@ -65,6 +67,7 @@ def lambda_handler(event, context):
 
     data.pop("PartitionKey", None)
     data.pop("LastUpdated", None)
+    data.pop("TTL", None)
 
     if "MapUrl" in data:
         for key, value in data.items():
@@ -119,6 +122,7 @@ def _get_zip_code_data(zip_code, utc_dt):
 
             data["PartitionKey"] = "ZipCode:{}".format(zip_code)
             data["LastUpdated"] = utc_dt.isoformat()
+            data["TTL"] = int((utc_dt + timedelta(hours=24) - datetime.fromtimestamp(0)).total_seconds())
 
             db_zip_write = table.put_item(
                 Item=data
