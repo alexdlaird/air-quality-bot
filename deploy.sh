@@ -6,6 +6,20 @@ read_var() {
    echo ${VAR[1]} | sed 's/"/\\"/g'
 }
 
+deploy() {
+  LAMBDA_NAME=$1
+  LAMBDA_TIMEOUT=$2
+  ENV_VARS=$3
+
+  if aws lambda get-function --function-name $LAMBDA_NAME 2>&1 | grep -q "Function not found"
+  then
+    aws lambda create-function --function-name $LAMBDA_NAME --runtime python3.6 --role $AWS_ROLE --handler lambda_function.lambda_handler --zip-file fileb://$LAMBDA_NAME.zip
+  else
+    aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
+  fi
+  aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
+}
+
 ###########################################################
 # Initialize environment
 ###########################################################
@@ -44,43 +58,19 @@ zip -X -r -j Wildfire_inbound_POST.zip lambdas/inbound_POST/*
 LAMBDA_NAME=Wildfire_aqi_GET
 LAMBDA_TIMEOUT=10
 ENV_VARS='{"Variables":{"AIRNOW_API_KEYS":"'$AIRNOW_API_KEYS'","DYNAMODB_ENDPOINT":"'$DYNAMODB_ENDPOINT'","DYNAMODB_REGION":"'$DYNAMODB_REGION'","DYNAMODB_AQI_TABLE":"'$DYNAMODB_AQI_TABLE'"}}'
-if aws lambda get-function --function-name $LAMBDA_NAME 2>&1 | grep -q "Function not found"
-then
-  aws lambda create-function --function-name $LAMBDA_NAME --runtime python3.6 --role $AWS_ROLE --handler lambda_function.lambda_handler --zip-file fileb://$LAMBDA_NAME.zip
-else
-  aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
-fi
-aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
+deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
 
 LAMBDA_NAME=Wildfire_evacuation_GET
 LAMBDA_TIMEOUT=10
 ENV_VARS='{"Variables":{}}'
-if aws lambda get-function --function-name $LAMBDA_NAME 2>&1 | grep -q "Function not found"
-then
-  aws lambda create-function --function-name $LAMBDA_NAME --runtime python3.6 --role $AWS_ROLE --handler lambda_function.lambda_handler --zip-file fileb://$LAMBDA_NAME.zip
-else
-  aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
-fi
-aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
+deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
 
 LAMBDA_NAME=Wildfire_fire_GET
 LAMBDA_TIMEOUT=10
 ENV_VARS='{"Variables":{}}'
-if aws lambda get-function --function-name $LAMBDA_NAME 2>&1 | grep -q "Function not found"
-then
-  aws lambda create-function --function-name $LAMBDA_NAME --runtime python3.6 --role $AWS_ROLE --handler lambda_function.lambda_handler --zip-file fileb://$LAMBDA_NAME.zip
-else
-  aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
-fi
-aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
+deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
 
 LAMBDA_NAME=Wildfire_inbound_POST
 LAMBDA_TIMEOUT=15
 ENV_VARS='{"Variables":{"WILDFIRE_API_URL":"'$WILDFIRE_API_URL'"}}'
-if aws lambda get-function --function-name $LAMBDA_NAME 2>&1 | grep -q "Function not found"
-then
-  aws lambda create-function --function-name $LAMBDA_NAME --runtime python3.6 --role $AWS_ROLE --handler lambda_function.lambda_handler --zip-file fileb://$LAMBDA_NAME.zip
-else
-  aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
-fi
-aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
+deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
