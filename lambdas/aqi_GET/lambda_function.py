@@ -142,14 +142,20 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
             Item=data
         )
         logger.info("DyanmoDB ZipCode write response: {}".format(db_zip_write))
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        logger.error(e)
+
         if retries < _AIRNOW_API_RETRIES:
+            logger.info("Retrying AirNow request ...")
+
             time.sleep(_AIRNOW_API_RETRY_DELAY)
 
             _airnow_api_request(zip_code, utc_dt, data, retries + 1)
         elif data is not None:
             logger.info("AirNow request timed out, falling back to cached value.")
-    except ValueError:
+    except ValueError as e:
+        logger.error(e)
+
         logger.info("AirNow returned invalid JSON.")
 
     return data
@@ -209,7 +215,9 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                         Item=data
                     )
                     logger.info("DyanmoDB ReportingArea write response: {}".format(db_reporting_area_write))
-            except requests.exceptions.RequestException:
+            except requests.exceptions.RequestException as e:
+                logger.error(e)
+
                 if data is not None:
                     logger.info("AirNow request timed out, falling back to cached value.")
     else:

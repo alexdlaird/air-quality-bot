@@ -43,9 +43,11 @@ def lambda_handler(event, context):
 
     try:
         response = requests.get("{}/aqi?zipCode={}".format(WILDFIRE_API_URL, zip_code, timeout=_WILDFIRE_API_TIMEOUT)).json()
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        logger.error(e)
+
         response = {
-            "errorMessage": "Oops, an unknown error occurred. AirNow seems overloaded at the moment."
+            "errorMessage": "Oops, an unknown error occurred. AirNow may be overloaded at the moment."
         }
 
     logger.info("Response from `/aqi`: {}".format(response))
