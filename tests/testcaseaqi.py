@@ -1,10 +1,8 @@
-import unittest
-import os
-import boto3
+from .testcase import TestCase
 from moto import mock_dynamodb2
 from lambdas.aqi_GET import lambda_function
 
-class TestCaseAQI(unittest.TestCase):
+class TestCaseAQI(TestCase):
 
     def test_aqi_52328(self):
         event = {"zipCode": "52328"}
@@ -15,30 +13,9 @@ class TestCaseAQI(unittest.TestCase):
 
     @mock_dynamodb2
     def test_aqi_94501(self):
+        self.given_dyanmo_table_exists()
+
         event = {"zipCode": "94501"}
-
-        dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
-
-        table = dynamodb.create_table(
-            TableName=os.environ.get("DYNAMODB_AQI_TABLE"),
-            KeySchema=[
-                {
-                    "AttributeName": "PartitionKey",
-                    "KeyType": "HASH"
-                },
-            ],
-            AttributeDefinitions=[
-                {
-                    "AttributeName": "PartitionKey",
-                    "AttributeType": "S"
-                },
-
-            ],
-            ProvisionedThroughput={
-                "ReadCapacityUnits": 1,
-                "WriteCapacityUnits": 1
-            }
-        )
 
         response = lambda_function.lambda_handler(event, {})
 

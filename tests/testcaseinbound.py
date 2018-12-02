@@ -1,15 +1,20 @@
+from .testcase import TestCase
 import unittest
-import os
-import json
+import responses
+
+from moto import mock_dynamodb2
 from lambdas.inbound_POST import lambda_function
 
-class TestCaseInbound(unittest.TestCase):
+class TestCaseInbound(TestCase):
 
+    @mock_dynamodb2
+    @responses.activate
     def test_inbound_94501(self):
-        example_file = open(os.path.join(os.path.dirname(__file__), "resources", "inbound_94501.json"), "rb")
-        json_str = example_file.read().decode("utf-8")
-        event = json.loads(json_str)
-        example_file.close()
+        zip_code = "94501"
+        self.given_dyanmo_table_exists()
+        self.given_api_routes_mocked()
+
+        event = self.load_resource("inbound_{}.json".format(zip_code))
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -18,11 +23,14 @@ class TestCaseInbound(unittest.TestCase):
         self.assertTrue("AQI of" in response["body"])
         self.assertTrue("<Media>" not in response["body"])
 
+    @mock_dynamodb2
+    @responses.activate
     def test_inbound_94501_map(self):
-        example_file = open(os.path.join(os.path.dirname(__file__), "resources", "inbound_94501_map.json"), "rb")
-        json_str = example_file.read().decode("utf-8")
-        event = json.loads(json_str)
-        example_file.close()
+        zip_code = "94501"
+        self.given_dyanmo_table_exists()
+        self.given_api_routes_mocked()
+
+        event = self.load_resource("inbound_{}_map.json".format(zip_code))
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -32,10 +40,7 @@ class TestCaseInbound(unittest.TestCase):
         self.assertTrue("<Media>" in response["body"])
 
     def test_inbound_text(self):
-        example_file = open(os.path.join(os.path.dirname(__file__), "resources", "inbound_text.json"), "rb")
-        json_str = example_file.read().decode("utf-8")
-        event = json.loads(json_str)
-        example_file.close()
+        event = self.load_resource("inbound_text.json")
 
         response = lambda_function.lambda_handler(event, {})
 
