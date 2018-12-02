@@ -8,7 +8,8 @@ env:
 	cp -n .env.example .env | true
 
 install: env
-	python -m pip install -r requirements.txt
+	$(PYTHON_BIN) -m pip install -r requirements.txt
+	$(PYTHON_BIN) -m pip install -r requirements_deploy.txt -t ./lib
 
 test:
 	export $$(cat .env | grep -v ^\# | xargs) && $(PYTHON_BIN) -m unittest discover

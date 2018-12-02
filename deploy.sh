@@ -46,10 +46,38 @@ fi
 ###########################################################
 
 rm Wildfire_*.zip
-zip -X -r -j Wildfire_aqi_GET.zip lambdas/aqi_GET/*
-zip -X -r -j Wildfire_evacuation_GET.zip lambdas/evacuation_GET/*
-zip -X -r -j Wildfire_fire_GET.zip lambdas/fire_GET/*
-zip -X -r -j Wildfire_inbound_POST.zip lambdas/inbound_POST/*
+
+mkdir build
+cp -R lambdas/aqi_GET/* build
+cp -R lib/* build
+cd build
+zip -X -r ../Wildfire_aqi_GET.zip *
+cd ..
+rm -rf build
+
+mkdir build
+cp -R lambdas/evacuation_GET/* build
+cp -R lib/* build
+cd build
+zip -X -r ../Wildfire_evacuation_GET.zip *
+cd ..
+rm -rf build
+
+mkdir build
+cp -R lambdas/fire_GET/* build
+cp -R lib/* build
+cd build
+zip -X -r ../Wildfire_fire_GET.zip *
+cd ..
+rm -rf build
+
+mkdir build
+cp -R lambdas/inbound_POST/* build
+cp -R lib/* build
+cd build
+zip -X -r ../Wildfire_inbound_POST.zip *
+cd ..
+rm -rf build
 
 ###########################################################
 # Deploy Lambdas

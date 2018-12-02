@@ -4,8 +4,8 @@ import random
 import logging
 import boto3
 import time
+import requests
 
-from botocore.vendored import requests
 from decimal import Decimal
 from datetime import datetime, timedelta
 from dateutil import parser

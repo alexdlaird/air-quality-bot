@@ -1,10 +1,17 @@
+import responses
+
 from .testcase import TestCase
 from moto import mock_dynamodb2
 from lambdas.aqi_GET import lambda_function
 
 class TestCaseAQI(TestCase):
 
+    @mock_dynamodb2
+    @responses.activate
     def test_aqi_52328(self):
+        self.given_dyanmo_table_exists()
+        self.given_airnow_routes_mocked()
+
         event = {"zipCode": "52328"}
 
         response = lambda_function.lambda_handler(event, {})
@@ -12,8 +19,10 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response, {"errorMessage": "Sorry, AirNow data is unavailable for this zip code."})
 
     @mock_dynamodb2
+    @responses.activate
     def test_aqi_94501(self):
         self.given_dyanmo_table_exists()
+        self.given_airnow_routes_mocked()
 
         event = {"zipCode": "94501"}
 

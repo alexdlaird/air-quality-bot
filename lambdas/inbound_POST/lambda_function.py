@@ -1,9 +1,9 @@
 import logging
 import os
 import re
+import requests
 
 from urllib import parse
-from botocore.vendored import requests
 
 WILDFIRE_API_URL = os.environ.get("WILDFIRE_API_URL")
 

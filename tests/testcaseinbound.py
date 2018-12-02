@@ -1,6 +1,7 @@
 from .testcase import TestCase
 import unittest
 import responses
+import lambdas.inbound_POST
 
 from moto import mock_dynamodb2
 from lambdas.inbound_POST import lambda_function
@@ -13,6 +14,7 @@ class TestCaseInbound(TestCase):
         zip_code = "94501"
         self.given_dyanmo_table_exists()
         self.given_api_routes_mocked()
+        self.given_airnow_routes_mocked()
 
         event = self.load_resource("inbound_{}.json".format(zip_code))
 
@@ -29,6 +31,7 @@ class TestCaseInbound(TestCase):
         zip_code = "94501"
         self.given_dyanmo_table_exists()
         self.given_api_routes_mocked()
+        self.given_airnow_routes_mocked()
 
         event = self.load_resource("inbound_{}_map.json".format(zip_code))
 

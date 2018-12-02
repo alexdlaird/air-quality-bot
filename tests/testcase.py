@@ -49,7 +49,6 @@ class TestCase(unittest.TestCase):
                 "zipCode": urlparse.parse_qs(parsed.query)["zipCode"][0]
             }
 
-            print(aqi_route.lambda_handler(event, {}))
             return (200, {}, json.dumps(aqi_route.lambda_handler(event, {}), default=decimal_default))
 
         def _fire_request_callback(request):
@@ -68,10 +67,6 @@ class TestCase(unittest.TestCase):
 
             return (200, {}, json.dumps(evacuation_route.lambda_handler(event, {}), default=decimal_default))
 
-        # TODO: these don't seem to be properly applying yet
-
-        responses.add_passthru("www.airnowapi.org")
-
         responses.add_callback(
             responses.GET, "{}/aqi".format(os.environ.get("WILDFIRE_API_URL")),
             callback=_aqi_request_callback
@@ -83,6 +78,39 @@ class TestCase(unittest.TestCase):
         responses.add_callback(
             responses.GET, "{}/evacuation".format(os.environ.get("WILDFIRE_API_URL")),
             callback=_evacuation_request_callback
+        )
+
+    def given_airnow_routes_mocked(self):
+        def _airnow_api_request_callback(request):
+            parsed = urlparse.urlparse(request.url)
+            zip_code = urlparse.parse_qs(parsed.query)["zipCode"][0]
+
+            data = {
+                "94501": [{"DateObserved":"2018-12-02 ","HourObserved":14,"LocalTimeZone":"PST","ReportingArea":"Oakland","StateCode":"CA","Latitude":37.8,"Longitude":-122.27,"ParameterName":"O3","AQI":30,"Category":{"Number":1,"Name":"Good"}},{"DateObserved":"2018-12-02 ","HourObserved":14,"LocalTimeZone":"PST","ReportingArea":"Oakland","StateCode":"CA","Latitude":37.8,"Longitude":-122.27,"ParameterName":"PM2.5","AQI":15,"Category":{"Number":1,"Name":"Good"}}],
+                "52328": []
+            }[zip_code]
+
+            return (200, {}, json.dumps(data))
+
+        def _airnow_request_callback(request):
+            parsed = urlparse.urlparse(request.url)
+            zip_code = urlparse.parse_qs(parsed.query)["zipcode"][0]
+
+            map_url = {
+                "94501": "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg"
+            }[zip_code]
+            data = "<html><img src=\"{}\" width=\"525\" height=\"400\" border=\"0\" style=\"position:relative\" usemap=\"#CurMap\"/></html>".format(map_url)
+
+            return (200, {}, data)
+
+        responses.add_callback(
+            responses.GET, "http://www.airnowapi.org/aq/observation/zipCode/current/",
+            callback=_airnow_api_request_callback
+        )
+
+        responses.add_callback(
+            responses.GET, "https://airnow.gov/index.cfm",
+            callback=_airnow_request_callback
         )
 
     def load_resource(self, filename):
