@@ -43,7 +43,7 @@ def lambda_handler(event, context):
 
     try:
         response = requests.get("{}/aqi?zipCode={}".format(WILDFIRE_API_URL, zip_code, timeout=_WILDFIRE_API_TIMEOUT)).json()
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.ConnectionError as e:
         logger.error(e)
 
         response = {

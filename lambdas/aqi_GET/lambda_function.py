@@ -142,7 +142,7 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
             Item=data
         )
         logger.info("DyanmoDB ZipCode write response: {}".format(db_zip_write))
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.ConnectionError as e:
         logger.error(e)
 
         if retries < _AIRNOW_API_RETRIES:
@@ -215,7 +215,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                         Item=data
                     )
                     logger.info("DyanmoDB ReportingArea write response: {}".format(db_reporting_area_write))
-            except requests.exceptions.RequestException as e:
+            except requests.exceptions.ConnectionError as e:
                 logger.error(e)
 
                 if data is not None:

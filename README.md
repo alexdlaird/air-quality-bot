@@ -49,10 +49,9 @@ Initialize the deployment environment by running `make install` locally, then
 edit the `.env` file's `AWS_ROLE` with the ID of the Role created above and the
 `AIRNOW_API_KEYS` list with one or more [AirNow API keys](https://docs.airnowapi.org/).
 
-Note that, on initial deploy, your Lambdas will be pointing to the generally
-available endpoint for the Wildfire Bot until you complete the `AWS API Gateway Routes`
-section below and update the `WILDFIRE_API_URL` variable to point to your own
-endpoint.
+Note that, on initial deploy, your Lambdas will be pointing to the an endpoint
+that does not exist until you complete the `AWS API Gateway Routes` section
+below and update the `WILDFIRE_API_URL` variable to point to the deployed endpoint.
 
 Deploy the Lambdas to your AWS environment using the deploy script:
 
@@ -107,7 +106,8 @@ put the following template:
 ```
 
 Deploy the new API Gateway. Note the newly generated `Invoke URL` and update the
-`WILDFIRE_API_URL` variable in `.env`, then redeploy.
+`WILDFIRE_API_URL` variable in `.env`, then redeploy your Lambdas by running
+`./deploy.sh` again.
 
 ### Setup Twilio
 

@@ -52,7 +52,7 @@ zip -X -r -j Wildfire_fire_GET.zip lambdas/fire_GET/*
 zip -X -r -j Wildfire_inbound_POST.zip lambdas/inbound_POST/*
 
 ###########################################################
-# Deploy
+# Deploy Lambdas
 ###########################################################
 
 LAMBDA_NAME=Wildfire_aqi_GET
