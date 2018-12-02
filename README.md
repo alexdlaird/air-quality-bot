@@ -1,8 +1,10 @@
 # Wildfire Bot
 
-The Wildfire Bot is generally available by texting a zip code (415) 212-4229. The bot will respond with information pertaining to wildfires and air quality.
+The Wildfire Bot is generally available by texting a zip code (415) 212-4229. The
+bot will respond with information pertaining to wildfires and air quality.
 
-The instructions below illustrate how to similarly setup the bot in your own AWS and Twilio environments.
+The instructions below illustrate how to similarly setup the bot in your own
+AWS and Twilio environments.
 
 ## Getting Started
 
@@ -105,13 +107,15 @@ put the following template:
 ```
 
 Deploy the new API Gateway. Note the newly generated `Invoke URL` and update the
-`WILDFIRE_API_URL` variable in `.env` accordingly.
+`WILDFIRE_API_URL` variable in `.env`, then redeploy.
 
 ### Setup Twilio
 
 In Twilio, create a phone number and set it up. Under "Messaging", select
 "Webhook" for when "A Message Comes In", select "POST", and enter the deployed
 API Gateway URL for `/inbound`.
+
+That's it! Your bot is now setup and ready to respond to texts.
 
 ## Deploy Updates
 
