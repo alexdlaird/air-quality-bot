@@ -3,6 +3,7 @@ import json
 import random
 import logging
 import boto3
+import time
 
 from botocore.vendored import requests
 from decimal import Decimal
@@ -17,6 +18,11 @@ AIRNOW_API_KEYS = json.loads(os.environ.get("AIRNOW_API_KEYS"))
 AIRNOW_API_URL = os.environ.get("AIRNOW_API_URL", "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={}&distance=25&API_KEY={}")
 AIRNOW_URL = os.environ.get("AIRNOW_URL", "https://airnow.gov/index.cfm?action=airnow.local_city&zipcode={}&submit=Go")
 AIRNOW_MAP_URL_PREFIX = os.environ.get("AIRNOW_MAP_URL_PREFIX", "https://files.airnowtech.org/airnow/today/")
+
+_AIRNOW_API_TIMEOUT = 2
+_AIRNOW_API_RETRIES = 2
+_AIRNOW_API_RETRY_DELAY = 2
+_AIRNOW_TIMEOUT = 3
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -81,9 +87,6 @@ def lambda_handler(event, context):
     return data
 
 def _get_zip_code_data(zip_code, utc_dt):
-    airnow_api_key = random.choice(AIRNOW_API_KEYS)
-    logger.info("AirNow API key: {}".format(airnow_api_key))
-
     db_zip_read = table.get_item(
         Key={
             "PartitionKey": "ZipCode:{}".format(zip_code)
@@ -102,41 +105,52 @@ def _get_zip_code_data(zip_code, utc_dt):
         else:
             logger.info("No ZipCode value found, querying AirNow for data")
 
-        logger.info(AIRNOW_API_URL.format(zip_code, airnow_api_key))
-
-        try:
-            response = requests.get(AIRNOW_API_URL.format(zip_code, airnow_api_key), timeout=2)
-
-            logger.info("AirNow API response: {}".format(response.text))
-
-            # If a cached value already exists, we want to update that instead
-            if data is None:
-                data = {}
-
-            for parameter in response.json():
-                parameter["DateObserved"] = parameter["DateObserved"].strip()
-                parameter["Longitude"] = Decimal(str(parameter["Longitude"]))
-                parameter["Latitude"] = Decimal(str(parameter["Latitude"]))
-
-                data[parameter["ParameterName"]] = parameter
-
-            data["PartitionKey"] = "ZipCode:{}".format(zip_code)
-            data["LastUpdated"] = utc_dt.isoformat()
-            data["TTL"] = int((utc_dt + timedelta(hours=24) - datetime.fromtimestamp(0)).total_seconds())
-
-            db_zip_write = table.put_item(
-                Item=data
-            )
-            logger.info("DyanmoDB ZipCode write response: {}".format(db_zip_write))
-        except requests.exceptions.RequestException:
-            if data is not None:
-                logger.info("AirNow request timed out, falling back to cached value.")
-        except ValueError:
-            logger.info("AirNow returned invalid JSON.")
+        data = _airnow_api_request(zip_code, utc_dt, data)
     else:
         logger.info("Cached ZipCode value less than an hour old, using that")
 
         data = db_zip_read["Item"]
+
+    return data
+
+def _airnow_api_request(zip_code, utc_dt, data, retries=0):
+    airnow_api_key = random.choice(AIRNOW_API_KEYS)
+
+    logger.info("AirNow API URL: {}".format(AIRNOW_API_URL.format(zip_code, airnow_api_key)))
+
+    try:
+        response = requests.get(AIRNOW_API_URL.format(zip_code, airnow_api_key), timeout=_AIRNOW_API_TIMEOUT)
+
+        logger.info("AirNow API response: {}".format(response.text))
+
+        # If a cached value already exists, we want to update that instead
+        if data is None:
+            data = {}
+
+        for parameter in response.json():
+            parameter["DateObserved"] = parameter["DateObserved"].strip()
+            parameter["Longitude"] = Decimal(str(parameter["Longitude"]))
+            parameter["Latitude"] = Decimal(str(parameter["Latitude"]))
+
+            data[parameter["ParameterName"]] = parameter
+
+        data["PartitionKey"] = "ZipCode:{}".format(zip_code)
+        data["LastUpdated"] = utc_dt.isoformat()
+        data["TTL"] = int((utc_dt + timedelta(hours=24) - datetime.fromtimestamp(0)).total_seconds())
+
+        db_zip_write = table.put_item(
+            Item=data
+        )
+        logger.info("DyanmoDB ZipCode write response: {}".format(db_zip_write))
+    except requests.exceptions.RequestException:
+        if retries < _AIRNOW_API_RETRIES:
+            time.sleep(_AIRNOW_API_RETRY_DELAY)
+
+            _airnow_api_request(zip_code, utc_dt, data, retries + 1)
+        elif data is not None:
+            logger.info("AirNow request timed out, falling back to cached value.")
+    except ValueError:
+        logger.info("AirNow returned invalid JSON.")
 
     return data
 
@@ -178,7 +192,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                 logger.info("No ReportingArea value found, querying AirNow for data")
 
             try:
-                response = requests.get(AIRNOW_URL.format(zip_code_data["PartitionKey"][len("ZipCode") + 1:]), timeout=3)
+                response = requests.get(AIRNOW_URL.format(zip_code_data["PartitionKey"][len("ZipCode") + 1:]), timeout=_AIRNOW_TIMEOUT)
 
                 if AIRNOW_MAP_URL_PREFIX in response.text:
                     map_url = response.text[response.text.find(AIRNOW_MAP_URL_PREFIX):]

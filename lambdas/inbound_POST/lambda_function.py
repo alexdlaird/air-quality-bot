@@ -7,7 +7,7 @@ from botocore.vendored import requests
 
 WILDFIRE_API_URL = os.environ.get("WILDFIRE_API_URL")
 
-AQI_MESSAGES = {
+_AQI_MESSAGES = {
     "Good": "Air quality is considered satisfactory, and air pollution poses little or no risk.",
     "Moderate": "Air quality is acceptable; however, for some pollutants there may be a moderate health concern for a very small number of people. For example, people who are unusually sensitive to ozone may experience respiratory symptoms.",
     "Unhealthy for Sensitive Groups": "Although general public is not likely to be affected at this AQI range, people with lung disease, older adults and children are at a greater risk from exposure to ozone, whereas persons with heart and lung disease, older adults and children are at greater risk from the presence of particles in the air.",
@@ -15,6 +15,7 @@ AQI_MESSAGES = {
     "Very Unhealthy": "This would trigger a health alert signifying that everyone may experience more serious health effects.",
     "Hazardous": "This would trigger a health warnings of emergency conditions. The entire population is more likely to be affected."
 }
+_WILDFIRE_API_TIMEOUT = 10
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -41,7 +42,7 @@ def lambda_handler(event, context):
         zip_code = zip_code.split("map")[0].strip()
 
     try:
-        response = requests.get("{}/aqi?zipCode={}".format(WILDFIRE_API_URL, zip_code, timeout=5)).json()
+        response = requests.get("{}/aqi?zipCode={}".format(WILDFIRE_API_URL, zip_code, timeout=_WILDFIRE_API_TIMEOUT)).json()
     except requests.exceptions.RequestException:
         response = {
             "errorMessage": "Oops, an unknown error occurred. AirNow seems overloaded at the moment."
@@ -66,7 +67,7 @@ def lambda_handler(event, context):
         time = response[parameter_name]["HourObserved"] - 12 if response[parameter_name]["HourObserved"] > 12 else response[parameter_name]["HourObserved"]
         time = str(int(12 if time == "00" else time)) + suffix + " " + response[parameter_name]["LocalTimeZone"]
 
-        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(response[parameter_name]["Category"]["Name"], int(response[parameter_name]["AQI"]), parameter_name, response[parameter_name]["ReportingArea"], time, AQI_MESSAGES[response[parameter_name]["Category"]["Name"]])
+        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(response[parameter_name]["Category"]["Name"], int(response[parameter_name]["AQI"]), parameter_name, response[parameter_name]["ReportingArea"], time, _AQI_MESSAGES[response[parameter_name]["Category"]["Name"]])
 
         media = None
         if include_map:

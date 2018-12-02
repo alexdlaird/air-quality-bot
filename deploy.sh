@@ -31,25 +31,25 @@ zip -X -r -j Wildfire_inbound_POST.zip lambdas/inbound_POST/*
 ###########################################################
 
 LAMBDA_NAME=Wildfire_aqi_GET
-LAMBDA_TIMEOUT=9
+LAMBDA_TIMEOUT=10
 ENV_VARS='{"Variables":{"AIRNOW_API_KEYS":"'$AIRNOW_API_KEYS'","DYNAMODB_ENDPOINT":"'$DYNAMODB_ENDPOINT'","DYNAMODB_REGION":"'$DYNAMODB_REGION'","DYNAMODB_AQI_TABLE":"'$DYNAMODB_AQI_TABLE'"}}'
 aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
 aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
 
 LAMBDA_NAME=Wildfire_evacuation_GET
-LAMBDA_TIMEOUT=9
+LAMBDA_TIMEOUT=10
 ENV_VARS='{"Variables":{}}'
 aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
 aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
 
 LAMBDA_NAME=Wildfire_fire_GET
-LAMBDA_TIMEOUT=9
+LAMBDA_TIMEOUT=10
 ENV_VARS='{"Variables":{}}'
 aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
 aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
 
 LAMBDA_NAME=Wildfire_inbound_POST
-LAMBDA_TIMEOUT=14
+LAMBDA_TIMEOUT=15
 ENV_VARS='{"Variables":{"WILDFIRE_API_URL":"'$WILDFIRE_API_URL'"}}'
 aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
 aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
