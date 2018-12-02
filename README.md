@@ -38,29 +38,19 @@ Create a new Role from a Policy with the following permissions:
 }
 ```
 
-Create a DynamoDB table with a partition key of `PartitionKey`. Optionally, enable
-TTL on the table and tell it to use the `TTL` field.
-
-Install and configure the [AWS CLI](https://docs.aws.amazon.com/lambda/latest/dg/setup-awscli.html).
-
-### AWS API Gateway URL
-
-Create an empty [API Gateway](https://console.aws.amazon.com/apigateway/home?region=us-east-1#/apis)
-and deploy it. Note the `Invoke URL` generated for the stage.
+Install and configure the [AWS CLI](https://docs.aws.amazon.com/lambda/latest/dg/setup-awscli.html)
+for the same account for which the Role was created.
 
 ### AWS Lambdas
 
-Initialize the deployment environment by running `make` locally, then edit the
-`.env` file's `WILDFIRE_API_URL` variable to have the `Invoke URL` from the
-API Gateway created above. Also fill in the `AIRNOW_API_KEYS` list with one or
-more [AirNow API keys](https://docs.airnowapi.org/).
+Initialize the deployment environment by running `make install` locally, then
+edit the `.env` file's `AWS_ROLE` with the ID of the Role created above and the
+`AIRNOW_API_KEYS` list with one or more [AirNow API keys](https://docs.airnowapi.org/).
 
-Create the following Python 3.6 Lambdas using the Role created above:
-
-- `Wildfire_aqi_GET`
-- `Wildfire_evacuation_GET`
-- `Wildfire_fire_GET`
-- `Wildfire_inbound_POST`
+Note that, on initial deploy, your Lambdas will be pointing to the generally
+available endpoint for the Wildfire Bot until you complete the `AWS API Gateway Routes`
+section below and update the `WILDFIRE_API_URL` variable to point to your own
+endpoint.
 
 Deploy the Lambdas to your AWS environment using the deploy script:
 
@@ -68,52 +58,14 @@ Deploy the Lambdas to your AWS environment using the deploy script:
 ./deploy.sh
 ```
 
+Optionally, TTL for `ZipCode` fields in the DynamoDB table can be enabled by going
+to [the AWS console](https://console.aws.amazon.com/dynamodb/home?region=us-east-1#tables:)
+and enabling TTL on the `TTL` field.
+
 ### AWS API Gateway Routes
 
-Navigate back to [the API Gateway](https://console.aws.amazon.com/apigateway/home?region=us-east-1#/apis)
-created above. In the API, do the following:
-
-- Create a new "Resource" with a path of `/aqi`
-  - Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_aqi_GET`
-    - Edit the "GET" method's "Method Request"
-      - Change the "Request Validator" to "Validate query string parameters and header"
-      - Add a required "URL Query String Parameter" of `zipCode`
-
-Under the "Integration Request" for `/aqi`, under "Mapping Templates" of "Content-Type" of `application/json` with the following template:
-
-```
-{
-    "zipCode":  "$input.params('zipCode')"
-}
-```
-
-- Create a new "Resource" with a path of `/evacuation`
-  - Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_evacuation_GET`
-    - Edit the "GET" method's "Method Request"
-      - Change the "Request Validator" to "Validate query string parameters and header"
-      - Add a required "URL Query String Parameter" of `zipCode`
-
-Under the "Integration Request" for `/evacuation`, under "Mapping Templates" of "Content-Type" of `application/json` with the following template:
-
-```
-{
-    "zipCode":  "$input.params('zipCode')"
-}
-```
-
-- Create a new "Resource" with a path of `/fire`
-  - Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_fire_GET`
-    - Edit the "GET" method's "Method Request"
-      - Change the "Request Validator" to "Validate query string parameters and header"
-      - Add a required "URL Query String Parameter" of `zipCode`
-
-Under the "Integration Request" for `/fire`, under "Mapping Templates" of "Content-Type" of `application/json` with the following template:
-
-```
-{
-    "zipCode":  "$input.params('zipCode')"
-}
-```
+Create an [API Gateway](https://console.aws.amazon.com/apigateway/home?region=us-east-1#/apis).
+In the API, do the following:
 
 - Create a new "Resource" with a path of `/inbound`
   - Create a new "POST" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_inbound_POST`
@@ -129,7 +81,31 @@ Last, under the "Integration Response" for `/inbound`, edit the `200` response. 
 $inputRoot.body
 ```
 
-Deploy the new API Gateway.
+Additionally, create the following "Resource" paths:
+
+- `/aqi`
+- `/fire`
+- `/evacuate`
+
+Under each of the above, do the following:
+
+- Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_<ROUTE_NAME>_GET`, where <ROUTE_NAME> corresponds to the name of the Lambda we created
+to execute on this method
+  - Edit the "GET" method's "Method Request"
+    - Change the "Request Validator" to "Validate query string parameters and header"
+    - Add a required "URL Query String Parameter" of `zipCode`
+
+Under the "Integration Request", under "Mapping Templates" of "Content-Type" of `application/json`,
+put the following template:
+
+```
+{
+    "zipCode":  "$input.params('zipCode')"
+}
+```
+
+Deploy the new API Gateway. Note the newly generated `Invoke URL` and update the
+`WILDFIRE_API_URL` variable in `.env` accordingly.
 
 ### Setup Twilio
 
