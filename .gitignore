@@ -2,6 +2,7 @@
 .idea/
 *.iml
 *.zip
+.venv
 .env
 lib
 build
