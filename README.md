@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/alexdlaird/wildfire-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/wildfire-bot)
+
+
 # Wildfire Bot
 
 The Wildfire Bot is generally available by texting a zip code (415) 212-4229. The
