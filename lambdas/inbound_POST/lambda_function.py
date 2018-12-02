@@ -5,9 +5,7 @@ import re
 from urllib import parse
 from botocore.vendored import requests
 
-WILDFIRE_AQI_API_URL = os.environ.get("WILDFIRE_AQI_API_URL")
-WILDFIRE_EVACUATION_API_URL = os.environ.get("WILDFIRE_EVACUATION_API_URL")
-WILDFIRE_FIRE_API_URL = os.environ.get("WILDFIRE_FIRE_API_URL")
+WILDFIRE_API_URL = os.environ.get("WILDFIRE_API_URL")
 
 AQI_MESSAGES = {
     "Good": "Air quality is considered satisfactory, and air pollution poses little or no risk.",
@@ -43,7 +41,7 @@ def lambda_handler(event, context):
         zip_code = zip_code.split("map")[0].strip()
 
     try:
-        response = requests.get(WILDFIRE_AQI_API_URL.format(zip_code, timeout=5)).json()
+        response = requests.get("{}/aqi?zipCode={}".format(WILDFIRE_API_URL, zip_code, timeout=5)).json()
     except requests.exceptions.RequestException:
         response = {
             "errorMessage": "Oops, an unknown error occurred. AirNow seems overloaded at the moment."

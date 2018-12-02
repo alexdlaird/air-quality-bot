@@ -1,6 +1,6 @@
 # Wildfire Bot
 
-The Wilfire Bot is generally available by texting a zip code (415) 212-4229. The bot will respond with information pertaining to wildfires and air quality.
+The Wildfire Bot is generally available by texting a zip code (415) 212-4229. The bot will respond with information pertaining to wildfires and air quality.
 
 The instructions below illustrate how to similarly setup the bot in your own AWS and Twilio environments.
 
@@ -43,7 +43,17 @@ TTL on the table and tell it to use the `TTL` field.
 
 Install and configure the [AWS CLI](https://docs.aws.amazon.com/lambda/latest/dg/setup-awscli.html).
 
+### AWS API Gateway URL
+
+Create an empty [API Gateway](https://console.aws.amazon.com/apigateway/home?region=us-east-1#/apis)
+and deploy it. Note the `Invoke URL` generated for the stage.
+
 ### AWS Lambdas
+
+Initialize the deployment environment by running `make` locally, then edit the
+`.env` file's `WILDFIRE_API_URL` variable to have the `Invoke URL` from the
+API Gateway created above. Also fill in the `AIRNOW_API_KEYS` list with one or
+more [AirNow API keys](https://docs.airnowapi.org/).
 
 Create the following Python 3.6 Lambdas using the Role created above:
 
@@ -58,24 +68,10 @@ Deploy the Lambdas to your AWS environment using the deploy script:
 ./deploy.sh
 ```
 
-Once deployed, navigate to [the Lambda console](https://console.aws.amazon.com/lambda/home).
+### AWS API Gateway Routes
 
-For the `Wildfire_aqi_GET` Lambda, add the following environment variables:
-
-- `DYNAMODB_REGION` (like `us-east-1`)
-- `DYNAMODB_ENDPOINT` (like `https://dynamodb.us-east-1.amazonaws.com`)
-- `DYNAMODB_TABLE`
-- `AIRNOW_API_KEYS` (JSON list of API keys formatted `["0c498778-b1be-4fdd-b25e-3a2b96b04769","d9313cb1-35e5-4aa7-a7d6-6d155ecebb7e"]`)
-
-For the `Wildfire_inbound_POST` Lambda, add the following environment variables:
-
-- `WILDFIRE_AQI_API_URL` (this is the `/aqi` endpoint from the API Gateway you'll create below)
-- `WILDFIRE_EVACUATION_API_URL` (this is the `/evacuation` endpoint from the API Gateway you'll create below)
-- `WILDFIRE_FIRE_API_URL` (this is the `/fire` endpoint from the API Gateway you'll create below)
-
-### AWS API Gateways
-
-Create a new API Gateway in AWS. In the API, do the following:
+Navigate back to [the API Gateway](https://console.aws.amazon.com/apigateway/home?region=us-east-1#/apis)
+created above. In the API, do the following:
 
 - Create a new "Resource" with a path of `/aqi`
   - Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_aqi_GET`

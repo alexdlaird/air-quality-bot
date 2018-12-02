@@ -11,7 +11,7 @@ from dateutil import parser
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")
-DYNAMODB_TABLE = os.environ.get("DYNAMODB_TABLE")
+DYNAMODB_AQI_TABLE = os.environ.get("DYNAMODB_AQI_TABLE")
 
 AIRNOW_API_KEYS = json.loads(os.environ.get("AIRNOW_API_KEYS"))
 AIRNOW_API_URL = os.environ.get("AIRNOW_API_URL", "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={}&distance=25&API_KEY={}")
@@ -22,7 +22,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb", region_name=DYNAMODB_REGION, endpoint_url=DYNAMODB_ENDPOINT)
-table = dynamodb.Table(DYNAMODB_TABLE)
+table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
 def lambda_handler(event, context):
     logger.info("Event: {}".format(event))
