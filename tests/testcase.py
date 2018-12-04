@@ -68,15 +68,15 @@ class TestCase(unittest.TestCase):
             return (200, {}, json.dumps(evacuation_route.lambda_handler(event, {}), default=decimal_default))
 
         responses.add_callback(
-            responses.GET, "{}/aqi".format(os.environ.get("WILDFIRE_API_URL")),
+            responses.GET, "{}/aqi".format(os.environ.get("AIR_QUALITY_API_URL")),
             callback=_aqi_request_callback
         )
         responses.add_callback(
-            responses.GET, "{}/fire".format(os.environ.get("WILDFIRE_API_URL")),
+            responses.GET, "{}/fire".format(os.environ.get("AIR_QUALITY_API_URL")),
             callback=_fire_request_callback
         )
         responses.add_callback(
-            responses.GET, "{}/evacuation".format(os.environ.get("WILDFIRE_API_URL")),
+            responses.GET, "{}/evacuation".format(os.environ.get("AIR_QUALITY_API_URL")),
             callback=_evacuation_request_callback
         )
 

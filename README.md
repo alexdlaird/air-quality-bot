@@ -1,10 +1,11 @@
-[![Build Status](https://travis-ci.org/alexdlaird/wildfire-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/wildfire-bot)
+[![Build Status](https://travis-ci.org/alexdlaird/air-quality-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/air-quality-bot)
 
 
-# Wildfire Bot
+# Air Quality Bot
 
-The Wildfire Bot is generally available by texting a zip code (415) 212-4229. The
-bot will respond with information pertaining to wildfires and air quality.
+The Air Quality Bot is generally available by texting a zip code (and optionally
+the word "map") to (415) 212-4229. The bot will respond with the latest air
+quality report for your region.
 
 The instructions below illustrate how to similarly setup the bot in your own
 AWS and Twilio environments.
@@ -54,7 +55,7 @@ edit the `.env` file's `AWS_ROLE` with the ID of the Role created above and the
 
 Note that, on initial deploy, your Lambdas will be pointing to the an endpoint
 that does not exist until you complete the `AWS API Gateway Routes` section
-below and update the `WILDFIRE_API_URL` variable to point to the deployed endpoint.
+below and update the `AIR_QUALITY_API_URL` variable to point to the deployed endpoint.
 
 Deploy the Lambdas to your AWS environment using the deploy script:
 
@@ -72,7 +73,7 @@ Create an [API Gateway](https://console.aws.amazon.com/apigateway/home?region=us
 In the API, do the following:
 
 - Create a new "Resource" with a path of `/inbound`
-  - Create a new "POST" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_inbound_POST`
+  - Create a new "POST" method with the "Integration type" of "Lambda Function" and point it to the Lambda `AirQuality_inbound_POST`
     - Edit the "POST" method's "Integration Request"
       - Under "Mapping Templates", add a "Content-Type" of `application/x-www-form-urlencoded` using the "General template" of "Method Request Passthrough"
     - Edit the "POST" method's "Method Response"
@@ -88,12 +89,10 @@ $inputRoot.body
 Additionally, create the following "Resource" paths:
 
 - `/aqi`
-- `/fire`
-- `/evacuate`
 
 Under each of the above, do the following:
 
-- Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `Wildfire_<ROUTE_NAME>_GET`, where <ROUTE_NAME> corresponds to the name of the Lambda we created
+- Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `AirQuality_<ROUTE_NAME>_GET`, where <ROUTE_NAME> corresponds to the name of the Lambda we created
 to execute on this method
   - Edit the "GET" method's "Method Request"
     - Change the "Request Validator" to "Validate query string parameters and header"
@@ -109,7 +108,7 @@ put the following template:
 ```
 
 Deploy the new API Gateway. Note the newly generated `Invoke URL` and update the
-`WILDFIRE_API_URL` variable in `.env`, then redeploy your Lambdas by running
+`AIR_QUALITY_API_URL` variable in `.env`, then redeploy your Lambdas by running
 `./deploy.sh` again.
 
 ### Setup Twilio

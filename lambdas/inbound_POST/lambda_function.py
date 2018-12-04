@@ -5,7 +5,7 @@ import requests
 
 from urllib import parse
 
-WILDFIRE_API_URL = os.environ.get("WILDFIRE_API_URL")
+AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL")
 
 _AQI_MESSAGES = {
     "Good": "Air quality is considered satisfactory, and air pollution poses little or no risk.",
@@ -15,7 +15,7 @@ _AQI_MESSAGES = {
     "Very Unhealthy": "This would trigger a health alert signifying that everyone may experience more serious health effects.",
     "Hazardous": "This would trigger a health warnings of emergency conditions. The entire population is more likely to be affected."
 }
-_WILDFIRE_API_TIMEOUT = 10
+_AIR_QUALITY_API_TIMEOUT = 10
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -42,7 +42,7 @@ def lambda_handler(event, context):
         zip_code = zip_code.split("map")[0].strip()
 
     try:
-        response = requests.get("{}/aqi?zipCode={}".format(WILDFIRE_API_URL, zip_code, timeout=_WILDFIRE_API_TIMEOUT)).json()
+        response = requests.get("{}/aqi?zipCode={}".format(AIR_QUALITY_API_URL, zip_code, timeout=_AIR_QUALITY_API_TIMEOUT)).json()
     except requests.exceptions.ConnectionError as e:
         logger.error(e)
 
