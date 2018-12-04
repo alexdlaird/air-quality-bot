@@ -8,8 +8,6 @@ import decimal
 
 from moto import mock_dynamodb2
 from lambdas.aqi_GET import lambda_function as aqi_route
-from lambdas.fire_GET import lambda_function as fire_route
-from lambdas.evacuation_GET import lambda_function as evacuation_route
 
 def decimal_default(obj):
     if isinstance(obj, decimal.Decimal):
@@ -51,33 +49,9 @@ class TestCase(unittest.TestCase):
 
             return (200, {}, json.dumps(aqi_route.lambda_handler(event, {}), default=decimal_default))
 
-        def _fire_request_callback(request):
-            parsed = urlparse.urlparse(request.url)
-            event = {
-                "zipCode": urlparse.parse_qs(parsed.query)["zipCode"][0]
-            }
-
-            return (200, {}, json.dumps(fire_route.lambda_handler(event, {}), default=decimal_default))
-
-        def _evacuation_request_callback(request):
-            parsed = urlparse.urlparse(request.url)
-            event = {
-                "zipCode": urlparse.parse_qs(parsed.query)["zipCode"][0]
-            }
-
-            return (200, {}, json.dumps(evacuation_route.lambda_handler(event, {}), default=decimal_default))
-
         responses.add_callback(
             responses.GET, "{}/aqi".format(os.environ.get("AIR_QUALITY_API_URL")),
             callback=_aqi_request_callback
-        )
-        responses.add_callback(
-            responses.GET, "{}/fire".format(os.environ.get("AIR_QUALITY_API_URL")),
-            callback=_fire_request_callback
-        )
-        responses.add_callback(
-            responses.GET, "{}/evacuation".format(os.environ.get("AIR_QUALITY_API_URL")),
-            callback=_evacuation_request_callback
         )
 
     def given_airnow_routes_mocked(self):

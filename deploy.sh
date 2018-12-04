@@ -56,22 +56,6 @@ cd ..
 rm -rf build
 
 mkdir build
-cp -R lambdas/evacuation_GET/* build
-cp -R lib/* build
-cd build
-zip -X -r ../AirQuality_evacuation_GET.zip *
-cd ..
-rm -rf build
-
-mkdir build
-cp -R lambdas/fire_GET/* build
-cp -R lib/* build
-cd build
-zip -X -r ../AirQuality_fire_GET.zip *
-cd ..
-rm -rf build
-
-mkdir build
 cp -R lambdas/inbound_POST/* build
 cp -R lib/* build
 cd build
@@ -86,16 +70,6 @@ rm -rf build
 LAMBDA_NAME=AirQuality_aqi_GET
 LAMBDA_TIMEOUT=10
 ENV_VARS='{"Variables":{"AIRNOW_API_KEYS":"'$AIRNOW_API_KEYS'","DYNAMODB_ENDPOINT":"'$DYNAMODB_ENDPOINT'","DYNAMODB_REGION":"'$DYNAMODB_REGION'","DYNAMODB_AQI_TABLE":"'$DYNAMODB_AQI_TABLE'"}}'
-deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
-
-LAMBDA_NAME=AirQuality_evacuation_GET
-LAMBDA_TIMEOUT=10
-ENV_VARS='{"Variables":{}}'
-deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
-
-LAMBDA_NAME=AirQuality_fire_GET
-LAMBDA_TIMEOUT=10
-ENV_VARS='{"Variables":{}}'
 deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
 
 LAMBDA_NAME=AirQuality_inbound_POST
