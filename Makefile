@@ -1,5 +1,7 @@
 .PHONY: all env install
 
+SHELL := /usr/bin/env bash
+
 all: env virtualenv install
 
 env:
