@@ -1,4 +1,5 @@
-boto3==1.9.57
+moto==1.3.4
+boto3==1.7.84
+botocore==1.10.84
 requests==2.20.0
 responses==0.10.4
-moto==1.3.7
