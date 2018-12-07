@@ -18,7 +18,7 @@ install: env virtualenv
 		python -m pip install -r requirements_deploy.txt -t ./lib; \
 	)
 
-test: virtualenv
+test: env virtualenv
 	@( \
 		source .venv/bin/activate; \
 		export $$(cat .env | grep -v ^\# | xargs) && python -m unittest discover; \
