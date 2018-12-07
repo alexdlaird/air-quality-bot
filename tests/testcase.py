@@ -50,7 +50,7 @@ class TestCase(unittest.TestCase):
             return (200, {}, json.dumps(aqi_route.lambda_handler(event, {}), default=decimal_default))
 
         responses.add_callback(
-            responses.GET, "{}/aqi".format(os.environ.get("AIR_QUALITY_API_URL")),
+            responses.GET, "{}/aqi".format(os.environ.get("AIR_QUALITY_API_URL").lower()),
             callback=_aqi_request_callback
         )
 
