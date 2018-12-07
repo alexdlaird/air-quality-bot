@@ -2,6 +2,9 @@ language: python
 python:
 - '3.6'
 install:
-- make install
+- python -m pip install virtualenv
+- python -m virtualenv .venv
+- source .venv/bin/activate
+- python -m pip install -r requirements.txt
 script:
 - make test
