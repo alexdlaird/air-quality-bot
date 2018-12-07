@@ -9,7 +9,7 @@ class TestCaseAQI(TestCase):
     @mock_dynamodb2
     @responses.activate
     def test_aqi_52328(self):
-        self.given_dyanmo_table_exists()
+        self.given_dynamo_table_exists()
         self.given_airnow_routes_mocked()
 
         event = {"zipCode": "52328"}
@@ -21,7 +21,7 @@ class TestCaseAQI(TestCase):
     @mock_dynamodb2
     @responses.activate
     def test_aqi_94501(self):
-        self.given_dyanmo_table_exists()
+        self.given_dynamo_table_exists()
         self.given_airnow_routes_mocked()
 
         event = {"zipCode": "94501"}

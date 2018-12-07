@@ -16,7 +16,7 @@ def decimal_default(obj):
 
 class TestCase(unittest.TestCase):
 
-    def given_dyanmo_table_exists(self):
+    def given_dynamo_table_exists(self):
         dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
 
         table = dynamodb.create_table(

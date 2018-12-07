@@ -92,7 +92,7 @@ def _get_zip_code_data(zip_code, utc_dt):
             "PartitionKey": "ZipCode:{}".format(zip_code)
         }
     )
-    logger.info("DyanmoDB ZipCode read response: {}".format(db_zip_read))
+    logger.info("DynamoDB ZipCode read response: {}".format(db_zip_read))
 
     data = None
     if "Item" not in db_zip_read or (utc_dt - parser.parse(db_zip_read["Item"]["LastUpdated"])).total_seconds() > 3600:
@@ -141,7 +141,7 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
         db_zip_write = table.put_item(
             Item=data
         )
-        logger.info("DyanmoDB ZipCode write response: {}".format(db_zip_write))
+        logger.info("DynamoDB ZipCode write response: {}".format(db_zip_write))
     except requests.exceptions.ConnectionError as e:
         logger.error(e)
 
@@ -166,7 +166,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
             "PartitionKey": "ReportingArea:{}".format(zip_code_data[parameter_name]["ReportingArea"])
         }
     )
-    logger.info("DyanmoDB ReportingArea read response: {}".format(db_reporting_area_read))
+    logger.info("DynamoDB ReportingArea read response: {}".format(db_reporting_area_read))
 
     data = None
     if "Item" not in db_reporting_area_read or (utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
@@ -190,7 +190,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                 },
                 ReturnValues="UPDATED_NEW"
             )
-            logger.info("DyanmoDB ReportingArea update response: {}".format(db_reporting_area_update))
+            logger.info("DynamoDB ReportingArea update response: {}".format(db_reporting_area_update))
         else:
             if "Item" in db_reporting_area_read:
                 logger.info("Cached ReportingArea value expired, requesting latest AirNow data")
@@ -214,7 +214,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                     db_reporting_area_write = table.put_item(
                         Item=data
                     )
-                    logger.info("DyanmoDB ReportingArea write response: {}".format(db_reporting_area_write))
+                    logger.info("DynamoDB ReportingArea write response: {}".format(db_reporting_area_write))
             except requests.exceptions.ConnectionError as e:
                 logger.error(e)
 
