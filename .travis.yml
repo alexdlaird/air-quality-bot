@@ -4,4 +4,4 @@ python:
 install:
 - make install
 script:
-- make env test
+- make test
