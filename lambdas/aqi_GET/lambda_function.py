@@ -123,11 +123,16 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
 
         logger.info("AirNow API response: {}".format(response.text))
 
+        response_json = response.json()
+
+        if response.status_code != 200:
+            return data
+
         # If a cached value already exists, we want to update that instead
         if data is None:
             data = {}
 
-        for parameter in response.json():
+        for parameter in response_json:
             parameter["DateObserved"] = parameter["DateObserved"].strip()
             parameter["Longitude"] = Decimal(str(parameter["Longitude"]))
             parameter["Latitude"] = Decimal(str(parameter["Latitude"]))

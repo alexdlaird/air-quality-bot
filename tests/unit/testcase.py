@@ -91,6 +91,24 @@ class TestCase(unittest.TestCase):
             callback=_airnow_request_callback
         )
 
+    def given_airnow_api_server_error(self):
+        def _airnow_api_request_callback(request):
+            return (500, {}, "Internal Server Error")
+
+        responses.add_callback(
+            responses.GET, "http://www.airnowapi.org/aq/observation/zipCode/current/",
+            callback=_airnow_api_request_callback
+        )
+
+    def given_airnow_api_bad_response(self):
+        def _airnow_api_request_callback(request):
+            return (200, {}, "<WebServiceError><Message>Invalid API key</Message></WebServiceError>")
+
+        responses.add_callback(
+            responses.GET, "http://www.airnowapi.org/aq/observation/zipCode/current/",
+            callback=_airnow_api_request_callback
+        )
+
     def load_resource(self, filename):
         example_file = open(os.path.join(os.path.dirname(__file__), "resources", filename), "rb")
         json_str = example_file.read().decode("utf-8")

@@ -36,7 +36,31 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response["PM2.5"]["ReportingArea"], "Oakland")
         self.assertEqual(response["PM2.5"]["MapUrl"], "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg")
 
-    # TODO: add additional tests for cached responses
+    @mock_dynamodb2
+    @responses.activate
+    def test_aqi_air_now_non_200(self):
+        self.given_dynamo_table_exists()
+        self.given_airnow_api_server_error()
+
+        event = {"zipCode": "94501"}
+
+        response = lambda_function.lambda_handler(event, {})
+
+        self.assertEqual(response, {"errorMessage": "Oops, something went wrong. AirNow seems overloaded at the moment."})
+
+    @mock_dynamodb2
+    @responses.activate
+    def test_aqi_air_now_bad_response(self):
+        self.given_dynamo_table_exists()
+        self.given_airnow_api_bad_response()
+
+        event = {"zipCode": "94501"}
+
+        response = lambda_function.lambda_handler(event, {})
+
+        self.assertEqual(response, {"errorMessage": "Oops, something went wrong. AirNow seems overloaded at the moment."})
+
+    # TODO: add additional tests for cached /failed responses
 
 if __name__ == "__main__":
     unittest.main()
