@@ -1,4 +1,4 @@
-from .testcase import TestCase
+from testcase import TestCase
 import unittest
 import responses
 import lambdas.inbound_POST
