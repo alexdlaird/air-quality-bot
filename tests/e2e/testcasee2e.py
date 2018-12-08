@@ -4,14 +4,11 @@ import time
 import datetime
 import pytz
 
-from dotenv import load_dotenv
 from twilio.rest import Client
 
 class TestCaseE2E(unittest.TestCase):
 
     def setUp(self):
-        load_dotenv()
-
         self.client = Client(os.environ.get("TWILIO_ACCOUNT_SID"), os.environ.get("TWILIO_AUTH_TOKEN"))
 
     def test_text(self):

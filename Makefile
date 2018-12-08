@@ -23,11 +23,11 @@ install: env virtualenv
 test: env virtualenv
 	@( \
 		source .venv/bin/activate; \
-		python -m unittest discover -s tests/unit; \
+		export $$(cat .env | grep -v ^\# | xargs) && python -m unittest discover -s tests/unit; \
 	)
 
 test-e2e: env virtualenv
 	@( \
 		source .venv/bin/activate; \
-		python -m unittest discover -s tests/e2e; \
+		export $$(cat .env | grep -v ^\# | xargs) && python -m unittest discover -s tests/e2e; \
 	)

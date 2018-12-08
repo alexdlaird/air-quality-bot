@@ -6,7 +6,6 @@ import json
 import urllib.parse as urlparse
 import decimal
 
-from dotenv import load_dotenv
 from moto import mock_dynamodb2
 from lambdas.aqi_GET import lambda_function as aqi_route
 
@@ -16,9 +15,6 @@ def decimal_default(obj):
     raise TypeError
 
 class TestCase(unittest.TestCase):
-
-    def setUp(self):
-        load_dotenv()
 
     def given_dynamo_table_exists(self):
         dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
