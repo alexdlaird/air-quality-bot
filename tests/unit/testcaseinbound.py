@@ -1,8 +1,8 @@
-from testcase import TestCase
 import unittest
 import responses
 import lambdas.inbound_POST
 
+from testcase import TestCase
 from moto import mock_dynamodb2
 from lambdas.inbound_POST import lambda_function
 
