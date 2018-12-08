@@ -5,7 +5,7 @@ import requests
 
 from urllib import parse
 
-AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL")
+AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 
 _AQI_MESSAGES = {
     "Good": "Air quality is considered satisfactory, and air pollution poses little or no risk.",
