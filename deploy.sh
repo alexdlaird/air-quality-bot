@@ -30,6 +30,8 @@ AIR_QUALITY_API_URL=$(read_var AIR_QUALITY_API_URL .env)
 DYNAMODB_ENDPOINT=$(read_var DYNAMODB_ENDPOINT .env)
 DYNAMODB_REGION=$(read_var DYNAMODB_REGION .env)
 DYNAMODB_AQI_TABLE=$(read_var DYNAMODB_AQI_TABLE .env)
+TRAVIS_E2E_REPO=$(read_var TRAVIS_E2E_REPO .env)
+TRAVIS_ACCESS_TOKEN=$(read_var TRAVIS_ACCESS_TOKEN .env)
 
 ###########################################################
 # Initialize AWS environment
@@ -76,3 +78,23 @@ LAMBDA_NAME=AirQuality_inbound_POST
 LAMBDA_TIMEOUT=15
 ENV_VARS='{"Variables":{"AIR_QUALITY_API_URL":"'$AIR_QUALITY_API_URL'"}}'
 deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
+
+###########################################################
+# Trigger E2E Tests
+###########################################################
+
+if [ ! -z "$TRAVIS_ACCESS_TOKEN" ] && [ ! -z "$TRAVIS_E2E_REPO" ];
+then
+  body='{
+  "request": {
+  "branch":"master"
+  }}'
+
+  curl -s -X POST \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json" \
+     -H "Travis-API-Version: 3" \
+     -H "Authorization: token $TRAVIS_ACCESS_TOKEN" \
+     -d "$body" \
+     https://api.travis-ci.org/repo/$TRAVIS_E2E_REPO/requests
+fi
