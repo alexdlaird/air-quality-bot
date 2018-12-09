@@ -1,6 +1,6 @@
 import responses
 
-from testcase import TestCase
+from .testcase import TestCase
 from moto import mock_dynamodb2
 from lambdas.aqi_GET import lambda_function
 
