@@ -119,6 +119,18 @@ API Gateway URL for `/inbound`.
 
 That's it! Your bot is now setup and ready to respond to texts.
 
+## Travis Build
+
+If you would like the project to build for you in Travis (or similar), you may
+need to add the following environment variables to the CI's console. Their
+actual values do not matter (use dummy values, not real), but certain versions
+of the `boto` dependency need them to be present when initializing its
+configuration.
+
+* `AWS_ACCESS_KEY_ID`
+* `AWS_DEFAULT_REGION`
+* `AWS_SECRET_ACCESS_KEY`
+
 ## Deploy Updates
 
 After the initial installation in to your AWS environment, updates to the Lambdas
