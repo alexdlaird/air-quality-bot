@@ -6,6 +6,7 @@ import boto3
 import time
 import requests
 
+from datadog import datadog_lambda_wrapper, lambda_metric
 from decimal import Decimal
 from datetime import datetime, timedelta
 from dateutil import parser
@@ -30,7 +31,10 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource("dynamodb", region_name=DYNAMODB_REGION, endpoint_url=DYNAMODB_ENDPOINT)
 table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
+@datadog_lambda_wrapper
 def lambda_handler(event, context):
+    lambda_metric("airqualitybot.aqi_POST.request", 1, tags=[])
+
     logger.info("Event: {}".format(event))
 
     zip_code = event["zipCode"]
@@ -47,6 +51,8 @@ def lambda_handler(event, context):
             parameter_name = "PM10"
 
         if parameter_name is None:
+            lambda_metric("airqualitybot.aqi_GET.zip-code-unavailable", 1, tags=[])
+
             data = {
                 "errorMessage": "Sorry, AirNow data is unavailable for this zip code."
             }
@@ -61,6 +67,9 @@ def lambda_handler(event, context):
                 if parser.parse(reporting_area_data["LastUpdated"]) > parser.parse(zip_code_data["LastUpdated"]) and \
                         "CachedAQI" in reporting_area_data and \
                         parser.parse(reporting_area_data["CachedAQI"]["LastUpdated"]) < utc_dt + timedelta(hours=24):
+                    lambda_metric("airqualitybot.aqi_GET.reporting-area-cache-fallback", 1, tags=[])
+                    logger.info("ReportingArea cached data is more recent, using that")
+
                     data = reporting_area_data["CachedAQI"]
 
                 data["MapUrl"] = reporting_area_data["MapUrl"]
@@ -97,16 +106,19 @@ def _get_zip_code_data(zip_code, utc_dt):
     data = None
     if "Item" not in db_zip_read or (utc_dt - parser.parse(db_zip_read["Item"]["LastUpdated"])).total_seconds() > 3600:
         if "Item" in db_zip_read:
-            logger.info("Cached ZipCode value expired, requesting latest AirNow data")
+            lambda_metric("airqualitybot.aqi_GET.zip-code-cache-expired", 1, tags=[])
+            logger.info("Cached ZipCode value expired, requesting latest AirNow API data")
 
-            # We're still storing off the expired cached value here, in case AirNow is overloaded
-            # and our request fails
+            # We're still storing off the expired cached value here, in case
+            # AirNow API is overloaded and our request fails
             data = db_zip_read["Item"]
         else:
-            logger.info("No ZipCode value found, querying AirNow for data")
+            logger.info("No ZipCode value found, querying AirNow API for data")
 
+        lambda_metric("airqualitybot.aqi_GET.airnowapi-request", 1, tags=[])
         data = _airnow_api_request(zip_code, utc_dt, data)
     else:
+        lambda_metric("airqualitybot.aqi_GET.zip-code-cache-fallback", 1, tags=[])
         logger.info("Cached ZipCode value less than an hour old, using that")
 
         data = db_zip_read["Item"]
@@ -139,36 +151,42 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
 
             data[parameter["ParameterName"]] = parameter
 
-        data["PartitionKey"] = "ZipCode:{}".format(zip_code)
-        data["LastUpdated"] = utc_dt.isoformat()
-        data["TTL"] = int((utc_dt + timedelta(hours=24) - datetime.fromtimestamp(0)).total_seconds())
+        if "PM2.5" in data or "PM10" in data:
+            data["PartitionKey"] = "ZipCode:{}".format(zip_code)
+            data["LastUpdated"] = utc_dt.isoformat()
+            data["TTL"] = int((utc_dt + timedelta(hours=24) - datetime.fromtimestamp(0)).total_seconds())
 
-        db_zip_write = table.put_item(
-            Item=data
-        )
-        logger.info("DynamoDB ZipCode write response: {}".format(db_zip_write))
+            db_zip_write = table.put_item(
+                Item=data
+            )
+            logger.info("DynamoDB ZipCode write response: {}".format(db_zip_write))
+        else:
+            logger.info("AirNow data is unavailable for this zip code, not caching")
     except requests.exceptions.ConnectionError as e:
+        lambda_metric("airqualitybot.aqi_GET.airnowapi-connection", 1, tags=[])
         logger.error(e)
 
         if retries < _AIRNOW_API_RETRIES:
-            logger.info("Retrying AirNow request ...")
+            lambda_metric("airqualitybot.aqi_GET.airnowapi-retry", 1, tags=[])
+            logger.info("Retrying AirNow API request ...")
 
             time.sleep(_AIRNOW_API_RETRY_DELAY)
 
             _airnow_api_request(zip_code, utc_dt, data, retries + 1)
         elif data is not None:
-            logger.info("AirNow request timed out, falling back to cached value.")
+            logger.info("AirNow API request timed out, falling back to cached value.")
     except ValueError as e:
+        lambda_metric("airqualitybot.aqi_GET.error.airnowapi-response", 1, tags=[])
         logger.error(e)
 
-        logger.info("AirNow returned invalid JSON.")
+        logger.info("AirNow API returned invalid JSON.")
 
     return data
 
 def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
     db_reporting_area_read = table.get_item(
         Key={
-            "PartitionKey": "ReportingArea:{}".format(zip_code_data[parameter_name]["ReportingArea"])
+            "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"], zip_code_data[parameter_name]["StateCode"])
         }
     )
     logger.info("DynamoDB ReportingArea read response: {}".format(db_reporting_area_read))
@@ -176,17 +194,16 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
     data = None
     if "Item" not in db_reporting_area_read or (utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
         if "Item" in db_reporting_area_read and parser.parse(zip_code_data["LastUpdated"]) > parser.parse(db_reporting_area_read["Item"]["LastUpdated"]):
+            lambda_metric("airqualitybot.aqi_GET.airnow-request", 1, tags=[])
             logger.info("Cached ReportingArea value expired, using latest ZipCode data")
 
             data = db_reporting_area_read["Item"]
-
             data["CachedAQI"] = zip_code_data.copy()
-
             data["LastUpdated"] = utc_dt.isoformat()
 
             db_reporting_area_update = table.update_item(
                 Key={
-                  "PartitionKey": "ReportingArea:{}".format(zip_code_data[parameter_name]["ReportingArea"])
+                  "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"], zip_code_data[parameter_name]["StateCode"])
                 },
                 UpdateExpression="set LastUpdated = :dt, CachedAQI = :aqi",
                 ExpressionAttributeValues={
@@ -196,35 +213,35 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                 ReturnValues="UPDATED_NEW"
             )
             logger.info("DynamoDB ReportingArea update response: {}".format(db_reporting_area_update))
-        else:
-            if "Item" in db_reporting_area_read:
-                logger.info("Cached ReportingArea value expired, requesting latest AirNow data")
-            else:
-                logger.info("No ReportingArea value found, querying AirNow for data")
+        elif "Item" not in db_reporting_area_read:
+            logger.info("No ReportingArea value found, querying AirNow for data")
 
             try:
+                lambda_metric("airqualitybot.aqi_GET.airnow-request", 1, tags=[])
                 response = requests.get(AIRNOW_URL.format(zip_code_data["PartitionKey"][len("ZipCode") + 1:]), timeout=_AIRNOW_TIMEOUT)
 
                 if AIRNOW_MAP_URL_PREFIX in response.text:
                     map_url = response.text[response.text.find(AIRNOW_MAP_URL_PREFIX):]
                     map_url = map_url[0:map_url.find(".jpg") + 4]
 
-                    data = {}
-                    data["MapUrl"] = map_url
-                    data["CachedAQI"] = zip_code_data.copy()
-
-                    data["PartitionKey"] = "ReportingArea:{}".format(zip_code_data[parameter_name]["ReportingArea"])
-                    data["LastUpdated"] = utc_dt.isoformat()
+                    data = {
+                        "MapUrl": map_url,
+                        "CachedAQI": zip_code_data.copy(),
+                        "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"], zip_code_data[parameter_name]["StateCode"]),
+                        "LastUpdated": utc_dt.isoformat()
+                    }
 
                     db_reporting_area_write = table.put_item(
                         Item=data
                     )
                     logger.info("DynamoDB ReportingArea write response: {}".format(db_reporting_area_write))
             except requests.exceptions.ConnectionError as e:
+                # We don't retry these as they're expensive and infrequent, and
+                # once we have the URL for the ReportingArea map, it doesn't expire
+                lambda_metric("airqualitybot.aqi_GET.error.airnow-connection", 1, tags=[])
                 logger.error(e)
 
-                if data is not None:
-                    logger.info("AirNow request timed out, falling back to cached value.")
+                logger.info("AirNow request timed out, map will be unavailable for this ReportingArea")
     else:
         logger.info("Cached ReportingArea value less than an hour old, using that")
 

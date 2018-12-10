@@ -49,5 +49,31 @@ class TestCaseInbound(TestCase):
 
         self.assertEqual(response, {"body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Send us a zip code and we'll reply with the area's Air Quality Index (AQI). Put \"map\" at the end and we'll include the regional map too.</Body></Message></Response>"})
 
+    @mock_dynamodb2
+    @responses.activate
+    def test_inbound_52328(self):
+        zip_code = "52328"
+        self.given_dynamo_table_exists()
+        self.given_api_routes_mocked()
+        self.given_airnow_routes_mocked()
+
+        event = self.load_resource("inbound_{}.json".format(zip_code))
+
+        response = lambda_function.lambda_handler(event, {})
+
+        self.assertEqual(response, {"body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Sorry, AirNow data is unavailable for this zip code.</Body></Message></Response>"})
+
+    @mock_dynamodb2
+    @responses.activate
+    def test_error_message_response(self):
+        zip_code = "94501"
+        self.given_dynamo_table_exists()
+
+        event = self.load_resource("inbound_{}.json".format(zip_code))
+
+        response = lambda_function.lambda_handler(event, {})
+
+        self.assertEqual(response, {"body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Oops, an unknown error occurred. AirNow may be overloaded at the moment.</Body></Message></Response>"})
+
 if __name__ == "__main__":
     unittest.main()

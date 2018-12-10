@@ -40,6 +40,63 @@ class TestCase(unittest.TestCase):
             }
         )
 
+    def given_zip_code_cached(self, last_updated):
+        dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
+        table = dynamodb.Table(os.environ.get("DYNAMODB_AQI_TABLE"))
+
+        data = {
+            "PartitionKey": "ZipCode:94501",
+            "LastUpdated": last_updated,
+            "PM2.5": {
+                "AQI": 25,
+                "Category": {
+                    "Name": "Moderate"
+                },
+                "DateObserved": "2018-11-17",
+                "HourObserved": 10,
+                "LocalTimeZone": "PST",
+                "ParameterName": "PM2.5",
+                "ReportingArea": "Oakland",
+                "StateCode": "CA"
+            },
+            "PM10": {
+                "AQI": 26,
+                "Category": {
+                    "Name": "Moderate"
+                },
+                "DateObserved": "2018-11-17",
+                "HourObserved": 10,
+                "LocalTimeZone": "PST",
+                "ParameterName": "PM10",
+                "ReportingArea": "Oakland",
+                "StateCode": "CA"
+            }
+        }
+
+        table.put_item(
+            Item=data
+        )
+
+        return data
+
+    def given_reporting_area_cached(self, last_updated, zip_code_data=None):
+        dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
+        table = dynamodb.Table(os.environ.get("DYNAMODB_AQI_TABLE"))
+
+        data = {
+            "PartitionKey": "ReportingArea:Oakland|CA",
+            "LastUpdated": last_updated,
+            "MapUrl": "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg"
+        }
+        if zip_code_data is not None:
+            data["CachedAQI"] = zip_code_data
+
+        db_reporting_area_write = table.put_item(
+            Item=data
+        )
+
+        return data
+
     def given_api_routes_mocked(self):
         def _aqi_request_callback(request):
             parsed = urlparse.urlparse(request.url)
@@ -60,7 +117,7 @@ class TestCase(unittest.TestCase):
             zip_code = urlparse.parse_qs(parsed.query)["zipCode"][0]
 
             data = {
-                "94501": [{"DateObserved":"2018-12-02 ","HourObserved":14,"LocalTimeZone":"PST","ReportingArea":"Oakland","StateCode":"CA","Latitude":37.8,"Longitude":-122.27,"ParameterName":"O3","AQI":30,"Category":{"Number":1,"Name":"Good"}},{"DateObserved":"2018-12-02 ","HourObserved":14,"LocalTimeZone":"PST","ReportingArea":"Oakland","StateCode":"CA","Latitude":37.8,"Longitude":-122.27,"ParameterName":"PM2.5","AQI":15,"Category":{"Number":1,"Name":"Good"}}],
+                "94501": [{"DateObserved":"2018-12-02 ","HourObserved":14,"LocalTimeZone":"PST","ReportingArea":"Oakland","StateCode":"CA","Latitude":37.8,"Longitude":-122.27,"ParameterName":"PM2.5","AQI":15,"Category":{"Number":1,"Name":"Good"}}],
                 "52328": []
             }[zip_code]
 
@@ -104,6 +161,33 @@ class TestCase(unittest.TestCase):
             responses.GET, "http://www.airnowapi.org/aq/observation/zipCode/current/",
             callback=_airnow_api_request_callback
         )
+
+    def verify_dynamo_key_exists(self, key, last_updated=None, changed=False):
+        dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
+        table = dynamodb.Table(os.environ.get("DYNAMODB_AQI_TABLE"))
+        dynamo_response = table.get_item(
+            Key={
+                "PartitionKey": key
+            }
+        )
+
+        self.assertTrue("Item" in dynamo_response)
+        if last_updated is not None:
+            if changed:
+                self.assertNotEqual(last_updated, dynamo_response["Item"]["LastUpdated"])
+            else:
+                self.assertEqual(last_updated, dynamo_response["Item"]["LastUpdated"])
+
+    def verify_dynamo_key_not_exists(self, key):
+        dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
+        table = dynamodb.Table(os.environ.get("DYNAMODB_AQI_TABLE"))
+        dynamo_response = table.get_item(
+            Key={
+                "PartitionKey": key
+            }
+        )
+
+        self.assertTrue("Item" not in dynamo_response)
 
     def load_resource(self, filename):
         example_file = open(os.path.join(os.path.dirname(__file__), "resources", filename), "rb")
