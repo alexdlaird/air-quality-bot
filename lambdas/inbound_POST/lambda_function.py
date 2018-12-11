@@ -3,7 +3,7 @@ import os
 import re
 import requests
 
-from datadog import datadog_lambda_wrapper, lambda_metric
+from utils import metricutils
 from urllib import parse
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
@@ -21,9 +21,8 @@ _AIR_QUALITY_API_TIMEOUT = 10
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-@datadog_lambda_wrapper
 def lambda_handler(event, context):
-    lambda_metric("airqualitybot.inbound_POST.request", 1, tags=[])
+    metricutils.increment("airqualitybot.inbound_POST.request")
 
     logger.info("Event: {}".format(event))
 
@@ -38,12 +37,12 @@ def lambda_handler(event, context):
 
 	# Check to ensure the message is valid (a zip code with an optional "map" at the end)
     if not re.match(r"^\d+(( )?map)?$", zip_code):
-        lambda_metric("airqualitybot.inbound_POST.help-response", 1, tags=[])
+        metricutils.increment("airqualitybot.inbound_POST.help-response")
 
         return _get_response("Send us a zip code and we'll reply with the area's Air Quality Index (AQI). Put \"map\" at the end and we'll include the regional map too.")
 
     if include_map:
-        lambda_metric("airqualitybot.inbound_POST.map-requested", 1, tags=[])
+        metricutils.increment("airqualitybot.inbound_POST.map-requested")
         logger.info("Map requested")
 
         zip_code = zip_code.split("map")[0].strip()
@@ -51,7 +50,7 @@ def lambda_handler(event, context):
     try:
         response = requests.get("{}/aqi?zipCode={}".format(AIR_QUALITY_API_URL, zip_code, timeout=_AIR_QUALITY_API_TIMEOUT)).json()
     except requests.exceptions.ConnectionError as e:
-        lambda_metric("airqualitybot.inbound_POST.error.aqi-request-failed", 1, tags=[])
+        metricutils.increment("airqualitybot.inbound_POST.error.aqi-request-failed")
         logger.error(e)
 
         response = {
@@ -70,7 +69,7 @@ def lambda_handler(event, context):
         parameter_name = "PM10"
 
     if parameter_name is None:
-        lambda_metric("airqualitybot.inbound_POST.error.no-pm", 1, tags=[])
+        metricutils.increment("airqualitybot.inbound_POST.error.no-pm")
 
         return _get_response("Oops, something went wrong. AirNow seems overloaded at the moment.")
     else:
@@ -86,7 +85,7 @@ def lambda_handler(event, context):
             if "MapUrl" in response[parameter_name]:
                 media = response[parameter_name]["MapUrl"]
             else:
-                lambda_metric("airqualitybot.inbound_POST.warn.map-request-failed", 1, tags=[])
+                metricutils.increment("airqualitybot.inbound_POST.warn.map-request-failed")
                 logger.info("Map requested but not included, no MapUrl provided from AirNow")
 
         return _get_response(msg, media)

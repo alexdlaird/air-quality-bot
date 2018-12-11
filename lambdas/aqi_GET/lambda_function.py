@@ -6,7 +6,7 @@ import boto3
 import time
 import requests
 
-from datadog import datadog_lambda_wrapper, lambda_metric
+from utils import metricutils
 from decimal import Decimal
 from datetime import datetime, timedelta
 from dateutil import parser
@@ -31,9 +31,8 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource("dynamodb", region_name=DYNAMODB_REGION, endpoint_url=DYNAMODB_ENDPOINT)
 table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
-@datadog_lambda_wrapper
 def lambda_handler(event, context):
-    lambda_metric("airqualitybot.aqi_POST.request", 1, tags=[])
+    metricutils.increment("airqualitybot.aqi_POST.request")
 
     logger.info("Event: {}".format(event))
 
@@ -51,7 +50,7 @@ def lambda_handler(event, context):
             parameter_name = "PM10"
 
         if parameter_name is None:
-            lambda_metric("airqualitybot.aqi_GET.zip-code-unavailable", 1, tags=[])
+            metricutils.increment("airqualitybot.aqi_GET.zip-code-unavailable")
 
             data = {
                 "errorMessage": "Sorry, AirNow data is unavailable for this zip code."
@@ -67,7 +66,7 @@ def lambda_handler(event, context):
                 if parser.parse(reporting_area_data["LastUpdated"]) > parser.parse(zip_code_data["LastUpdated"]) and \
                         "CachedAQI" in reporting_area_data and \
                         parser.parse(reporting_area_data["CachedAQI"]["LastUpdated"]) < utc_dt + timedelta(hours=24):
-                    lambda_metric("airqualitybot.aqi_GET.reporting-area-cache-fallback", 1, tags=[])
+                    metricutils.increment("airqualitybot.aqi_GET.reporting-area-cache-fallback")
                     logger.info("ReportingArea cached data is more recent, using that")
 
                     data = reporting_area_data["CachedAQI"]
@@ -106,7 +105,7 @@ def _get_zip_code_data(zip_code, utc_dt):
     data = None
     if "Item" not in db_zip_read or (utc_dt - parser.parse(db_zip_read["Item"]["LastUpdated"])).total_seconds() > 3600:
         if "Item" in db_zip_read:
-            lambda_metric("airqualitybot.aqi_GET.zip-code-cache-expired", 1, tags=[])
+            metricutils.increment("airqualitybot.aqi_GET.zip-code-cache-expired")
             logger.info("Cached ZipCode value expired, requesting latest AirNow API data")
 
             # We're still storing off the expired cached value here, in case
@@ -115,10 +114,10 @@ def _get_zip_code_data(zip_code, utc_dt):
         else:
             logger.info("No ZipCode value found, querying AirNow API for data")
 
-        lambda_metric("airqualitybot.aqi_GET.airnowapi-request", 1, tags=[])
+        metricutils.increment("airqualitybot.aqi_GET.airnowapi-request")
         data = _airnow_api_request(zip_code, utc_dt, data)
     else:
-        lambda_metric("airqualitybot.aqi_GET.zip-code-cache-fallback", 1, tags=[])
+        metricutils.increment("airqualitybot.aqi_GET.zip-code-cache-fallback")
         logger.info("Cached ZipCode value less than an hour old, using that")
 
         data = db_zip_read["Item"]
@@ -163,11 +162,11 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
         else:
             logger.info("AirNow data is unavailable for this zip code, not caching")
     except requests.exceptions.ConnectionError as e:
-        lambda_metric("airqualitybot.aqi_GET.airnowapi-connection", 1, tags=[])
+        metricutils.increment("airqualitybot.aqi_GET.airnowapi-connection")
         logger.error(e)
 
         if retries < _AIRNOW_API_RETRIES:
-            lambda_metric("airqualitybot.aqi_GET.airnowapi-retry", 1, tags=[])
+            metricutils.increment("airqualitybot.aqi_GET.airnowapi-retry")
             logger.info("Retrying AirNow API request ...")
 
             time.sleep(_AIRNOW_API_RETRY_DELAY)
@@ -176,7 +175,7 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
         elif data is not None:
             logger.info("AirNow API request timed out, falling back to cached value.")
     except ValueError as e:
-        lambda_metric("airqualitybot.aqi_GET.error.airnowapi-response", 1, tags=[])
+        metricutils.increment("airqualitybot.aqi_GET.error.airnowapi-response")
         logger.error(e)
 
         logger.info("AirNow API returned invalid JSON.")
@@ -194,7 +193,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
     data = None
     if "Item" not in db_reporting_area_read or (utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
         if "Item" in db_reporting_area_read and parser.parse(zip_code_data["LastUpdated"]) > parser.parse(db_reporting_area_read["Item"]["LastUpdated"]):
-            lambda_metric("airqualitybot.aqi_GET.airnow-request", 1, tags=[])
+            metricutils.increment("airqualitybot.aqi_GET.airnow-request")
             logger.info("Cached ReportingArea value expired, using latest ZipCode data")
 
             data = db_reporting_area_read["Item"]
@@ -217,7 +216,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
             logger.info("No ReportingArea value found, querying AirNow for data")
 
             try:
-                lambda_metric("airqualitybot.aqi_GET.airnow-request", 1, tags=[])
+                metricutils.increment("airqualitybot.aqi_GET.airnow-request")
                 response = requests.get(AIRNOW_URL.format(zip_code_data["PartitionKey"][len("ZipCode") + 1:]), timeout=_AIRNOW_TIMEOUT)
 
                 if AIRNOW_MAP_URL_PREFIX in response.text:
@@ -238,7 +237,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
             except requests.exceptions.ConnectionError as e:
                 # We don't retry these as they're expensive and infrequent, and
                 # once we have the URL for the ReportingArea map, it doesn't expire
-                lambda_metric("airqualitybot.aqi_GET.error.airnow-connection", 1, tags=[])
+                metricutils.increment("airqualitybot.aqi_GET.error.airnow-connection")
                 logger.error(e)
 
                 logger.info("AirNow request timed out, map will be unavailable for this ReportingArea")
