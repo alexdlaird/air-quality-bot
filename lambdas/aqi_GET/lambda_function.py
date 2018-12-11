@@ -6,6 +6,7 @@ import boto3
 import time
 import requests
 
+from datadog import datadog_lambda_wrapper
 from utils import metricutils
 from decimal import Decimal
 from datetime import datetime, timedelta
@@ -31,6 +32,7 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource("dynamodb", region_name=DYNAMODB_REGION, endpoint_url=DYNAMODB_ENDPOINT)
 table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
+@datadog_lambda_wrapper
 def lambda_handler(event, context):
     metricutils.increment("aqi_GET.request")
 

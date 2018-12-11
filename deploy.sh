@@ -31,7 +31,7 @@ deploy() {
   else
     aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
   fi
-  aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS
+  aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS --layers "arn:aws:lambda:$DYNAMODB_REGION:464622532012:layer:Datadog-Python36-metric:1"
 }
 
 ###########################################################
@@ -44,6 +44,8 @@ AIR_QUALITY_API_URL=$(read_var AIR_QUALITY_API_URL .env)
 DYNAMODB_ENDPOINT=$(read_var DYNAMODB_ENDPOINT .env)
 DYNAMODB_REGION=$(read_var DYNAMODB_REGION .env)
 DYNAMODB_AQI_TABLE=$(read_var DYNAMODB_AQI_TABLE .env)
+DATADOG_API_KEY=$(read_var DATADOG_API_KEY .env)
+DATADOG_APP_KEY=$(read_var DATADOG_APP_KEY .env)
 TRAVIS_E2E_REPO=$(read_var TRAVIS_E2E_REPO .env)
 TRAVIS_ACCESS_TOKEN=$(read_var TRAVIS_ACCESS_TOKEN .env)
 
@@ -78,12 +80,12 @@ build $LAMBDA_FOLDER $LAMBDA_NAME
 
 LAMBDA_NAME=AirQuality_aqi_GET
 LAMBDA_TIMEOUT=10
-ENV_VARS='{"Variables":{"AIRNOW_API_KEYS":"'$AIRNOW_API_KEYS'","DYNAMODB_ENDPOINT":"'$DYNAMODB_ENDPOINT'","DYNAMODB_REGION":"'$DYNAMODB_REGION'","DYNAMODB_AQI_TABLE":"'$DYNAMODB_AQI_TABLE'"}}'
+ENV_VARS='{"Variables":{"AIRNOW_API_KEYS":"'$AIRNOW_API_KEYS'","DYNAMODB_ENDPOINT":"'$DYNAMODB_ENDPOINT'","DYNAMODB_REGION":"'$DYNAMODB_REGION'","DYNAMODB_AQI_TABLE":"'$DYNAMODB_AQI_TABLE'","DATADOG_API_KEY":"'$DATADOG_API_KEY'","DATADOG_APP_KEY":"'$DATADOG_APP_KEY'"}}'
 deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
 
 LAMBDA_NAME=AirQuality_inbound_POST
 LAMBDA_TIMEOUT=15
-ENV_VARS='{"Variables":{"AIR_QUALITY_API_URL":"'$AIR_QUALITY_API_URL'"}}'
+ENV_VARS='{"Variables":{"AIR_QUALITY_API_URL":"'$AIR_QUALITY_API_URL'","DATADOG_API_KEY":"'$DATADOG_API_KEY'","DATADOG_APP_KEY":"'$DATADOG_APP_KEY'"}}'
 deploy $LAMBDA_NAME $LAMBDA_TIMEOUT $ENV_VARS
 
 ###########################################################

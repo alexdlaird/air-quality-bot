@@ -1,13 +1,7 @@
 import logging
 import time
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+from datadog import lambda_metric
 
-def log(value, type, metric, tags=None):
-    if tags is None:
-        tags = []
-    print("MONITORING|{}|{}|{}|{}|#{}".format(int(time.time()), value, type, "airqualitybot." + metric, ",".join(tags)))
-
-def increment(metric, tags=[]):
-    log(1, "count", metric, tags)
+def increment(metric):
+    lambda_metric("airqualitybot.{}".format(metric), 1)

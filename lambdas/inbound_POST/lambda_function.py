@@ -3,6 +3,7 @@ import os
 import re
 import requests
 
+from datadog import datadog_lambda_wrapper
 from utils import metricutils
 from urllib import parse
 
@@ -21,6 +22,7 @@ _AIR_QUALITY_API_TIMEOUT = 10
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+@datadog_lambda_wrapper
 def lambda_handler(event, context):
     metricutils.increment("inbound_POST.request")
 
