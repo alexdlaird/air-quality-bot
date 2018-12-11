@@ -32,7 +32,7 @@ dynamodb = boto3.resource("dynamodb", region_name=DYNAMODB_REGION, endpoint_url=
 table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
 def lambda_handler(event, context):
-    metricutils.increment("aqi_POST.request")
+    metricutils.increment("aqi_GET.request")
 
     logger.info("Event: {}".format(event))
 
