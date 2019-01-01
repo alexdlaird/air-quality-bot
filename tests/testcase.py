@@ -1,21 +1,21 @@
-import unittest
-import os
 import boto3
-import responses
-import json
-import urllib.parse as urlparse
 import decimal
+import json
+import os
+import responses
+import unittest
+import urllib.parse as urlparse
 
-from moto import mock_dynamodb2
 from lambdas.aqi_GET import lambda_function as aqi_route
+
 
 def decimal_default(obj):
     if isinstance(obj, decimal.Decimal):
         return float(obj)
     raise TypeError
 
-class TestCase(unittest.TestCase):
 
+class TestCase(unittest.TestCase):
     def given_dynamo_table_exists(self):
         dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
 
@@ -117,7 +117,9 @@ class TestCase(unittest.TestCase):
             zip_code = urlparse.parse_qs(parsed.query)["zipCode"][0]
 
             data = {
-                "94501": [{"DateObserved":"2018-12-02 ","HourObserved":14,"LocalTimeZone":"PST","ReportingArea":"Oakland","StateCode":"CA","Latitude":37.8,"Longitude":-122.27,"ParameterName":"PM2.5","AQI":15,"Category":{"Number":1,"Name":"Good"}}],
+                "94501": [{"DateObserved": "2018-12-02 ", "HourObserved": 14, "LocalTimeZone": "PST",
+                           "ReportingArea": "Oakland", "StateCode": "CA", "Latitude": 37.8, "Longitude": -122.27,
+                           "ParameterName": "PM2.5", "AQI": 15, "Category": {"Number": 1, "Name": "Good"}}],
                 "52328": []
             }[zip_code]
 
@@ -130,7 +132,8 @@ class TestCase(unittest.TestCase):
             map_url = {
                 "94501": "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg"
             }[zip_code]
-            data = "<html><img src=\"{}\" width=\"525\" height=\"400\" border=\"0\" style=\"position:relative\" usemap=\"#CurMap\"/></html>".format(map_url)
+            data = "<html><img src=\"{}\" width=\"525\" height=\"400\" border=\"0\" style=\"position:relative\" usemap=\"#CurMap\"/></html>".format(
+                map_url)
 
             return (200, {}, data)
 

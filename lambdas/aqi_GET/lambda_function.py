@@ -1,23 +1,23 @@
-import os
-import json
-import random
-import logging
 import boto3
-import time
+import json
+import logging
+import os
+import random
 import requests
-
+import time
 from datadog import datadog_lambda_wrapper
-from utils import metricutils
-from decimal import Decimal
 from datetime import datetime, timedelta
 from dateutil import parser
+from decimal import Decimal
+from utils import metricutils
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")
 DYNAMODB_AQI_TABLE = os.environ.get("DYNAMODB_AQI_TABLE")
 
 AIRNOW_API_KEYS = json.loads(os.environ.get("AIRNOW_API_KEYS"))
-AIRNOW_API_URL = os.environ.get("AIRNOW_API_URL", "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={}&distance=25&API_KEY={}")
+AIRNOW_API_URL = os.environ.get("AIRNOW_API_URL",
+                                "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={}&distance=25&API_KEY={}")
 AIRNOW_URL = os.environ.get("AIRNOW_URL", "https://airnow.gov/index.cfm?action=airnow.local_city&zipcode={}&submit=Go")
 AIRNOW_MAP_URL_PREFIX = os.environ.get("AIRNOW_MAP_URL_PREFIX", "https://files.airnowtech.org/airnow/today/")
 
@@ -31,6 +31,7 @@ logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb", region_name=DYNAMODB_REGION, endpoint_url=DYNAMODB_ENDPOINT)
 table = dynamodb.Table(DYNAMODB_AQI_TABLE)
+
 
 @datadog_lambda_wrapper
 def lambda_handler(event, context):
@@ -66,8 +67,9 @@ def lambda_handler(event, context):
                 # If the ReportingArea's CachedAQI is more recent than the ZipCode value (i.e. the cache is old and a new
                 # request failed), fallback to the ReportArea's cache (assuming it isn't more than a day old)
                 if parser.parse(reporting_area_data["LastUpdated"]) > parser.parse(zip_code_data["LastUpdated"]) and \
-                        "CachedAQI" in reporting_area_data and \
-                        parser.parse(reporting_area_data["CachedAQI"]["LastUpdated"]) < utc_dt + timedelta(hours=24):
+                                "CachedAQI" in reporting_area_data and \
+                                parser.parse(reporting_area_data["CachedAQI"]["LastUpdated"]) < utc_dt + timedelta(
+                            hours=24):
                     metricutils.increment("aqi_GET.reporting-area-cache-fallback")
                     logger.info("ReportingArea cached data is more recent, using that")
 
@@ -95,6 +97,7 @@ def lambda_handler(event, context):
         data.pop("MapUrl")
 
     return data
+
 
 def _get_zip_code_data(zip_code, utc_dt):
     db_zip_read = table.get_item(
@@ -125,6 +128,7 @@ def _get_zip_code_data(zip_code, utc_dt):
         data = db_zip_read["Item"]
 
     return data
+
 
 def _airnow_api_request(zip_code, utc_dt, data, retries=0):
     airnow_api_key = random.choice(AIRNOW_API_KEYS)
@@ -184,17 +188,21 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
 
     return data
 
+
 def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
     db_reporting_area_read = table.get_item(
         Key={
-            "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"], zip_code_data[parameter_name]["StateCode"])
+            "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"],
+                                                         zip_code_data[parameter_name]["StateCode"])
         }
     )
     logger.info("DynamoDB ReportingArea read response: {}".format(db_reporting_area_read))
 
     data = None
-    if "Item" not in db_reporting_area_read or (utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
-        if "Item" in db_reporting_area_read and parser.parse(zip_code_data["LastUpdated"]) > parser.parse(db_reporting_area_read["Item"]["LastUpdated"]):
+    if "Item" not in db_reporting_area_read or (
+        utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
+        if "Item" in db_reporting_area_read and parser.parse(zip_code_data["LastUpdated"]) > parser.parse(
+                db_reporting_area_read["Item"]["LastUpdated"]):
             metricutils.increment("aqi_GET.airnow-request")
             logger.info("Cached ReportingArea value expired, using latest ZipCode data")
 
@@ -204,7 +212,8 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
 
             db_reporting_area_update = table.update_item(
                 Key={
-                  "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"], zip_code_data[parameter_name]["StateCode"])
+                    "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"],
+                                                                 zip_code_data[parameter_name]["StateCode"])
                 },
                 UpdateExpression="set LastUpdated = :dt, CachedAQI = :aqi",
                 ExpressionAttributeValues={
@@ -219,7 +228,8 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
 
             try:
                 metricutils.increment("aqi_GET.airnow-request")
-                response = requests.get(AIRNOW_URL.format(zip_code_data["PartitionKey"][len("ZipCode") + 1:]), timeout=_AIRNOW_TIMEOUT)
+                response = requests.get(AIRNOW_URL.format(zip_code_data["PartitionKey"][len("ZipCode") + 1:]),
+                                        timeout=_AIRNOW_TIMEOUT)
 
                 if AIRNOW_MAP_URL_PREFIX in response.text:
                     map_url = response.text[response.text.find(AIRNOW_MAP_URL_PREFIX):]
@@ -228,7 +238,8 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                     data = {
                         "MapUrl": map_url,
                         "CachedAQI": zip_code_data.copy(),
-                        "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"], zip_code_data[parameter_name]["StateCode"]),
+                        "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"],
+                                                                     zip_code_data[parameter_name]["StateCode"]),
                         "LastUpdated": utc_dt.isoformat()
                     }
 

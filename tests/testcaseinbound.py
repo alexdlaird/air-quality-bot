@@ -1,13 +1,12 @@
-import unittest
 import responses
-import lambdas.inbound_POST
-
-from .testcase import TestCase
+import unittest
 from moto import mock_dynamodb2
+
 from lambdas.inbound_POST import lambda_function
+from .testcase import TestCase
+
 
 class TestCaseInbound(TestCase):
-
     @mock_dynamodb2
     @responses.activate
     def test_inbound_94501(self):
@@ -47,7 +46,8 @@ class TestCaseInbound(TestCase):
 
         response = lambda_function.lambda_handler(event, {})
 
-        self.assertEqual(response, {"body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Send us a zip code and we'll reply with the area's Air Quality Index (AQI). Put \"map\" at the end and we'll include the regional map too.</Body></Message></Response>"})
+        self.assertEqual(response, {
+            "body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Send us a zip code and we'll reply with the area's Air Quality Index (AQI). Put \"map\" at the end and we'll include the regional map too.</Body></Message></Response>"})
 
     @mock_dynamodb2
     @responses.activate
@@ -61,7 +61,8 @@ class TestCaseInbound(TestCase):
 
         response = lambda_function.lambda_handler(event, {})
 
-        self.assertEqual(response, {"body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Sorry, AirNow data is unavailable for this zip code.</Body></Message></Response>"})
+        self.assertEqual(response, {
+            "body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Sorry, AirNow data is unavailable for this zip code.</Body></Message></Response>"})
 
     @mock_dynamodb2
     @responses.activate
@@ -73,7 +74,9 @@ class TestCaseInbound(TestCase):
 
         response = lambda_function.lambda_handler(event, {})
 
-        self.assertEqual(response, {"body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Oops, an unknown error occurred. AirNow may be overloaded at the moment.</Body></Message></Response>"})
+        self.assertEqual(response, {
+            "body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Oops, an unknown error occurred. AirNow may be overloaded at the moment.</Body></Message></Response>"})
+
 
 if __name__ == "__main__":
     unittest.main()

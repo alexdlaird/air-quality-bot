@@ -2,10 +2,9 @@ import logging
 import os
 import re
 import requests
-
 from datadog import datadog_lambda_wrapper
-from utils import metricutils
 from urllib import parse
+from utils import metricutils
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 
@@ -22,6 +21,7 @@ _AIR_QUALITY_API_TIMEOUT = 10
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 @datadog_lambda_wrapper
 def lambda_handler(event, context):
     metricutils.increment("inbound_POST.request")
@@ -37,11 +37,12 @@ def lambda_handler(event, context):
     zip_code = body.lower().strip()
     include_map = "map" in zip_code
 
-	# Check to ensure the message is valid (a zip code with an optional "map" at the end)
+    # Check to ensure the message is valid (a zip code with an optional "map" at the end)
     if not re.match(r"^\d+(( )?map)?$", zip_code):
         metricutils.increment("inbound_POST.help-response")
 
-        return _get_response("Send us a zip code and we'll reply with the area's Air Quality Index (AQI). Put \"map\" at the end and we'll include the regional map too.")
+        return _get_response(
+            "Send us a zip code and we'll reply with the area's Air Quality Index (AQI). Put \"map\" at the end and we'll include the regional map too.")
 
     if include_map:
         metricutils.increment("inbound_POST.map-requested")
@@ -50,7 +51,8 @@ def lambda_handler(event, context):
         zip_code = zip_code.split("map")[0].strip()
 
     try:
-        response = requests.get("{}/aqi?zipCode={}".format(AIR_QUALITY_API_URL, zip_code, timeout=_AIR_QUALITY_API_TIMEOUT)).json()
+        response = requests.get(
+            "{}/aqi?zipCode={}".format(AIR_QUALITY_API_URL, zip_code, timeout=_AIR_QUALITY_API_TIMEOUT)).json()
     except requests.exceptions.ConnectionError as e:
         metricutils.increment("inbound_POST.error.aqi-request-failed")
         logger.error(e)
@@ -77,10 +79,17 @@ def lambda_handler(event, context):
     else:
         # Clean up the time format
         suffix = "PM" if response[parameter_name]["HourObserved"] >= 12 else "AM"
-        time = response[parameter_name]["HourObserved"] - 12 if response[parameter_name]["HourObserved"] > 12 else response[parameter_name]["HourObserved"]
+        time = response[parameter_name]["HourObserved"] - 12 if response[parameter_name]["HourObserved"] > 12 else \
+        response[parameter_name]["HourObserved"]
         time = str(int(12 if time == "00" else time)) + suffix + " " + response[parameter_name]["LocalTimeZone"]
 
-        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(response[parameter_name]["Category"]["Name"], int(response[parameter_name]["AQI"]), parameter_name, response[parameter_name]["ReportingArea"], time, _AQI_MESSAGES[response[parameter_name]["Category"]["Name"]])
+        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(response[parameter_name]["Category"]["Name"],
+                                                                        int(response[parameter_name]["AQI"]),
+                                                                        parameter_name,
+                                                                        response[parameter_name]["ReportingArea"], time,
+                                                                        _AQI_MESSAGES[
+                                                                            response[parameter_name]["Category"][
+                                                                                "Name"]])
 
         media = None
         if include_map:
@@ -92,12 +101,14 @@ def lambda_handler(event, context):
 
         return _get_response(msg, media)
 
+
 def _get_response(msg, media=None):
     media_block = ""
     if media is not None:
         media_block = "<Media>{}</Media>".format(media)
 
-    xml_response = "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>{}</Body>{}</Message></Response>".format(msg, media_block)
+    xml_response = "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>{}</Body>{}</Message></Response>".format(
+        msg, media_block)
     logger.info("XML response: {}".format(xml_response))
 
     return {"body": xml_response}

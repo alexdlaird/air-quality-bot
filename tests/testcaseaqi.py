@@ -1,12 +1,12 @@
 import responses
-
-from .testcase import TestCase
 from datetime import datetime, timedelta
 from moto import mock_dynamodb2
+
 from lambdas.aqi_GET import lambda_function
+from .testcase import TestCase
+
 
 class TestCaseAQI(TestCase):
-
     @mock_dynamodb2
     @responses.activate
     def test_aqi_52328(self):
@@ -38,7 +38,8 @@ class TestCaseAQI(TestCase):
         self.assertTrue("ReportingArea" in response["PM2.5"])
         self.assertEqual(response["PM2.5"]["AQI"], 15)
         self.assertEqual(response["PM2.5"]["ReportingArea"], "Oakland")
-        self.assertEqual(response["PM2.5"]["MapUrl"], "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg")
+        self.assertEqual(response["PM2.5"]["MapUrl"],
+                         "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg")
 
     @mock_dynamodb2
     @responses.activate
@@ -60,7 +61,8 @@ class TestCaseAQI(TestCase):
         self.assertTrue("ReportingArea" in response["PM2.5"])
         self.assertEqual(response["PM2.5"]["AQI"], 25)
         self.assertEqual(response["PM2.5"]["ReportingArea"], "Oakland")
-        self.assertEqual(response["PM2.5"]["MapUrl"], "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg")
+        self.assertEqual(response["PM2.5"]["MapUrl"],
+                         "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg")
 
     @mock_dynamodb2
     @responses.activate
@@ -153,7 +155,8 @@ class TestCaseAQI(TestCase):
         response = lambda_function.lambda_handler(event, {})
 
         self.verify_dynamo_key_not_exists("ZipCode:94501")
-        self.assertEqual(response, {"errorMessage": "Oops, something went wrong. AirNow seems overloaded at the moment."})
+        self.assertEqual(response,
+                         {"errorMessage": "Oops, something went wrong. AirNow seems overloaded at the moment."})
 
     @mock_dynamodb2
     @responses.activate
@@ -166,7 +169,9 @@ class TestCaseAQI(TestCase):
         response = lambda_function.lambda_handler(event, {})
 
         self.verify_dynamo_key_not_exists("ZipCode:94501")
-        self.assertEqual(response, {"errorMessage": "Oops, something went wrong. AirNow seems overloaded at the moment."})
+        self.assertEqual(response,
+                         {"errorMessage": "Oops, something went wrong. AirNow seems overloaded at the moment."})
+
 
 if __name__ == "__main__":
     unittest.main()
