@@ -69,7 +69,7 @@ class TestCaseAQI(TestCase):
     def test_aqi_94501_zip_code_cached_no_map(self):
         self.given_dynamo_table_exists()
         last_updated = datetime.utcnow().isoformat()
-        zip_code_data = self.given_zip_code_cached(last_updated)
+        self.given_zip_code_cached(last_updated)
 
         event = {"zipCode": "94501"}
 
@@ -89,7 +89,7 @@ class TestCaseAQI(TestCase):
         self.given_dynamo_table_exists()
         self.given_airnow_routes_mocked()
         last_updated = (datetime.utcnow() - timedelta(hours=1, minutes=1)).isoformat()
-        zip_code_data = self.given_zip_code_cached(last_updated)
+        self.given_zip_code_cached(last_updated)
 
         event = {"zipCode": "94501"}
 
@@ -108,7 +108,7 @@ class TestCaseAQI(TestCase):
     def test_aqi_94501_zip_code_cache_expired_request_fails_cache_fallback(self):
         self.given_dynamo_table_exists()
         last_updated = (datetime.utcnow() - timedelta(hours=1, minutes=1)).isoformat()
-        zip_code_data = self.given_zip_code_cached(last_updated)
+        self.given_zip_code_cached(last_updated)
 
         event = {"zipCode": "94501"}
 

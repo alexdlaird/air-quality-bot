@@ -19,7 +19,7 @@ class TestCase(unittest.TestCase):
     def given_dynamo_table_exists(self):
         dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
 
-        table = dynamodb.create_table(
+        dynamodb.create_table(
             TableName=os.environ.get("DYNAMODB_AQI_TABLE"),
             KeySchema=[
                 {
@@ -91,7 +91,7 @@ class TestCase(unittest.TestCase):
         if zip_code_data is not None:
             data["CachedAQI"] = zip_code_data
 
-        db_reporting_area_write = table.put_item(
+        table.put_item(
             Item=data
         )
 
