@@ -72,11 +72,11 @@ Create an [API Gateway](https://console.aws.amazon.com/apigateway/home?region=us
 In the API, do the following:
 
 - Create a new "Resource" with a path of `/inbound`
-    - Create a new "POST" method with the "Integration type" of "Lambda Function" and point it to the Lambda `AirQuality_inbound_POST`
-        - Edit the "POST" method's "Integration Request"
-            - Under "Mapping Templates", add a "Content-Type" of `application/x-www-form-urlencoded` using the "General template" of "Method Request Passthrough"
-        - Edit the "POST" method's "Method Response"
-        - Edit the `200` response so it has a "Content type" of `application/xml`
+  - Create a new "POST" method with the "Integration type" of "Lambda Function" and point it to the Lambda `AirQuality_inbound_POST`
+    - Edit the "POST" method's "Integration Request"
+      - Under "Mapping Templates", add a "Content-Type" of `application/x-www-form-urlencoded` using the "General template" of "Method Request Passthrough"
+    - Edit the "POST" method's "Method Response"
+    - Edit the `200` response so it has a "Content type" of `application/xml`
 
 Last, under the "Integration Response" for `/inbound`, edit the `200` response. Under "Mapping Templates" of "Content-Type" of `application/xml` with the following template:
 
@@ -93,9 +93,9 @@ Under each of the above, do the following:
 
 - Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `AirQuality_<ROUTE_NAME>_GET`, where <ROUTE_NAME> corresponds to the name of the Lambda we created
 to execute on this method
-    - Edit the "GET" method's "Method Request"
-        - Change the "Request Validator" to "Validate query string parameters and header"
-        - Add a required "URL Query String Parameter" of `zipCode`
+  - Edit the "GET" method's "Method Request"
+    - Change the "Request Validator" to "Validate query string parameters and header"
+    - Add a required "URL Query String Parameter" of `zipCode`
 
 Under the "Integration Request", under "Mapping Templates" of "Content-Type" of `application/json`,
 put the following template:
