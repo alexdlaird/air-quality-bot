@@ -16,7 +16,7 @@ AWS and Twilio environments.
 
 Create a new Role from a Policy with the following permissions:
 
-```
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -59,7 +59,7 @@ below and update the `AIR_QUALITY_API_URL` variable to point to the deployed end
 
 Deploy the Lambdas to your AWS environment using the deploy script:
 
-```
+```sh
 ./deploy.sh
 ```
 
@@ -81,7 +81,7 @@ In the API, do the following:
 
 Last, under the "Integration Response" for `/inbound`, edit the `200` response. Under "Mapping Templates" of "Content-Type" of `application/xml` with the following template:
 
-```
+```js
 #set($inputRoot = $input.path('$'))
 $inputRoot.body
 ```
@@ -101,7 +101,7 @@ to execute on this method
 Under the "Integration Request", under "Mapping Templates" of "Content-Type" of `application/json`,
 put the following template:
 
-```
+```json
 {
     "zipCode":  "$input.params('zipCode')"
 }
@@ -136,6 +136,6 @@ configuration.
 After the initial installation in to your AWS environment, updates to the Lambdas
 can easily be redeployed at any time by rerunning the deploy script:
 
-```
+```sh
 ./deploy.sh
 ```
