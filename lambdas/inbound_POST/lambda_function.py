@@ -1,10 +1,16 @@
 import logging
 import os
 import re
+from urllib import parse
+
 import requests
 from datadog import datadog_lambda_wrapper
-from urllib import parse
+
 from utils import metricutils
+
+__author__ = 'Alex Laird'
+__copyright__ = 'Copyright 2018, Alex Laird'
+__version__ = '0.1.4'
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 
@@ -80,7 +86,7 @@ def lambda_handler(event, context):
         # Clean up the time format
         suffix = "PM" if response[parameter_name]["HourObserved"] >= 12 else "AM"
         time = response[parameter_name]["HourObserved"] - 12 if response[parameter_name]["HourObserved"] > 12 else \
-        response[parameter_name]["HourObserved"]
+            response[parameter_name]["HourObserved"]
         time = str(int(12 if time == "00" else time)) + suffix + " " + response[parameter_name]["LocalTimeZone"]
 
         msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(response[parameter_name]["Category"]["Name"],

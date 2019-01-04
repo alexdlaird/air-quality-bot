@@ -1,9 +1,14 @@
-import responses
 import unittest
+
+import responses
 from moto import mock_dynamodb2
 
 from lambdas.inbound_POST import lambda_function
 from .testcase import TestCase
+
+__author__ = 'Alex Laird'
+__copyright__ = 'Copyright 2018, Alex Laird'
+__version__ = '0.1.4'
 
 
 class TestCaseInbound(TestCase):

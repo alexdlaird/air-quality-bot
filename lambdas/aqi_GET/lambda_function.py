@@ -1,15 +1,21 @@
-import boto3
 import json
 import logging
 import os
 import random
-import requests
 import time
-from datadog import datadog_lambda_wrapper
 from datetime import datetime, timedelta
-from dateutil import parser
 from decimal import Decimal
+
+import boto3
+import requests
+from datadog import datadog_lambda_wrapper
+from dateutil import parser
+
 from utils import metricutils
+
+__author__ = 'Alex Laird'
+__copyright__ = 'Copyright 2018, Alex Laird'
+__version__ = '0.1.4'
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")
@@ -200,7 +206,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
 
     data = None
     if "Item" not in db_reporting_area_read or (
-        utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
+                utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
         if "Item" in db_reporting_area_read and parser.parse(zip_code_data["LastUpdated"]) > parser.parse(
                 db_reporting_area_read["Item"]["LastUpdated"]):
             metricutils.increment("aqi_GET.airnow-request")
