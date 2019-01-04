@@ -126,9 +126,9 @@ actual values do not matter (use dummy values, not real), but certain versions
 of the `boto` dependency need them to be present when initializing its
 configuration.
 
-* `AWS_ACCESS_KEY_ID`
-* `AWS_DEFAULT_REGION`
-* `AWS_SECRET_ACCESS_KEY`
+  - `AWS_ACCESS_KEY_ID`
+  - `AWS_DEFAULT_REGION`
+  - `AWS_SECRET_ACCESS_KEY`
 
 ## Deploy Updates
 
