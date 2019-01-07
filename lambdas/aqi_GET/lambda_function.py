@@ -13,9 +13,9 @@ from dateutil import parser
 
 from utils import metricutils
 
-__author__ = 'Alex Laird'
-__copyright__ = 'Copyright 2018, Alex Laird'
-__version__ = '0.1.4'
+__author__ = "Alex Laird"
+__copyright__ = "Copyright 2018, Alex Laird"
+__version__ = "0.1.4"
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")

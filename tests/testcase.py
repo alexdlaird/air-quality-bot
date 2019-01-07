@@ -9,9 +9,9 @@ import responses
 
 from lambdas.aqi_GET import lambda_function as aqi_route
 
-__author__ = 'Alex Laird'
-__copyright__ = 'Copyright 2018, Alex Laird'
-__version__ = '0.1.4'
+__author__ = "Alex Laird"
+__copyright__ = "Copyright 2018, Alex Laird"
+__version__ = "0.1.4"
 
 
 def decimal_default(obj):

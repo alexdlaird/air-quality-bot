@@ -8,9 +8,9 @@ from datadog import datadog_lambda_wrapper
 
 from utils import metricutils
 
-__author__ = 'Alex Laird'
-__copyright__ = 'Copyright 2018, Alex Laird'
-__version__ = '0.1.4'
+__author__ = "Alex Laird"
+__copyright__ = "Copyright 2018, Alex Laird"
+__version__ = "0.1.4"
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 
@@ -38,7 +38,7 @@ def lambda_handler(event, context):
     phone_number = data["From"][0]
     body = data["Body"][0]
 
-    logger.info("Received '{}' from {}".format(body, phone_number))
+    logger.info("Received \"{}\" from {}".format(body, phone_number))
 
     zip_code = body.lower().strip()
     include_map = "map" in zip_code
