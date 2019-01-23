@@ -1,4 +1,3 @@
-import decimal
 import json
 import os
 import unittest
@@ -8,16 +7,11 @@ import boto3
 import responses
 
 from lambdas.aqi_GET import lambda_function as aqi_route
+from utils.jsonutils import decimal_default
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.4"
-
-
-def decimal_default(obj):
-    if isinstance(obj, decimal.Decimal):
-        return float(obj)
-    raise TypeError
+__version__ = "0.1.5"
 
 
 class TestCase(unittest.TestCase):

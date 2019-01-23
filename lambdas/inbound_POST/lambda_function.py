@@ -7,10 +7,11 @@ import requests
 from datadog import datadog_lambda_wrapper
 
 from utils import metricutils
+from utils.decoratorutils import conditional_decorator
 
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.4"
+__copyright__ = "Copyright 2019, Alex Laird"
+__version__ = "0.1.5"
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 
@@ -28,7 +29,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-@datadog_lambda_wrapper
+@conditional_decorator(datadog_lambda_wrapper, not os.environ.get("FLASK_APP", None))
 def lambda_handler(event, context):
     metricutils.increment("inbound_POST.request")
 

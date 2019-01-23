@@ -118,6 +118,19 @@ API Gateway URL for `/inbound`.
 
 That's it! Your bot is now setup and ready to respond to texts.
 
+## Local Development
+
+To test changes locally before deploying them to Lambda, a simple [Flask](http://flask.pocoo.org/)
+server is included in `devserver.py`. After ensuring proper `dev` values are in `.env.dev`, execute:
+
+```sh
+make run-devserver
+```
+
+This will start a server with the appropriate routes and in-memory datastores,
+and it will also start a [ngrok](https://ngrok.com/) tunnel using [pyngrok](https://github.com/alexdlaird/pyngrok)
+so webhooks from Twilio can be tested locally.
+
 ## Travis Build
 
 If you would like the project to build for you in Travis (or similar), you may

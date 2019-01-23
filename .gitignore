@@ -4,5 +4,6 @@
 *.zip
 .venv
 .env
+.env.dev
 lib
 build

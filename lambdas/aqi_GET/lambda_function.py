@@ -12,10 +12,11 @@ from datadog import datadog_lambda_wrapper
 from dateutil import parser
 
 from utils import metricutils
+from utils.decoratorutils import conditional_decorator
 
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.4"
+__copyright__ = "Copyright 2019, Alex Laird"
+__version__ = "0.1.5"
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")
@@ -39,7 +40,7 @@ dynamodb = boto3.resource("dynamodb", region_name=DYNAMODB_REGION, endpoint_url=
 table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
 
-@datadog_lambda_wrapper
+@conditional_decorator(datadog_lambda_wrapper, not os.environ.get("FLASK_APP", None))
 def lambda_handler(event, context):
     metricutils.increment("aqi_GET.request")
 
