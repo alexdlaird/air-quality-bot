@@ -120,16 +120,17 @@ That's it! Your bot is now setup and ready to respond to texts.
 
 ## Local Development
 
-To test changes locally before deploying them to Lambda, a simple [Flask](http://flask.pocoo.org/)
-server is included in `devserver.py`. After ensuring proper `dev` values are in `.env.dev`, execute:
+To test the bot locally, simple [Flask](http://flask.pocoo.org/) server is included in `devserver.py`.
+Ensure proper `dev` values are in `.env.dev`, then execute:
 
 ```sh
 make run-devserver
 ```
 
 This will start a server with the appropriate routes and in-memory datastores,
-and it will also start a [ngrok](https://ngrok.com/) tunnel using [pyngrok](https://github.com/alexdlaird/pyngrok)
-so webhooks from Twilio can be tested locally.
+and it will also start a [ngrok](https://ngrok.com/) tunnel using
+[pyngrok](https://github.com/alexdlaird/pyngrok) so the bot can be fully tested
+end-to-end.
 
 ## Travis Build
 
