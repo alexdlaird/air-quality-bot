@@ -76,8 +76,11 @@ dictConfig(LOGGING)
 # Initialize the Flask app for a simple web server
 app = Flask(__name__)
 
-# Obtain the Flask server's port and open a ngrok tunnel using pyngrok
+# Get the dev server port (defaults to 5000 for Flask, can be overridden with `--port`
+# when starting the server
 port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 5000
+
+# Open a ngrok tunnel to the dev server
 public_url = ngrok.connect(port)
 print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}/\"".format(public_url, port))
 
@@ -93,8 +96,7 @@ TWILIO_ACCOUNT_SID = os.environ.get("AIR_QUALITY_DEV_TWILIO_ACCOUNT_SID", None)
 TWILIO_AUTH_TOKEN = os.environ.get("AIR_QUALITY_DEV_TWILIO_AUTH_TOKEN", None)
 TWILIO_SMS_NUMBER = os.environ.get("AIR_QUALITY_DEV_TWILIO_SMS_NUMBER", None)
 
-# If Twilio auth details are given, update webhooks to utilize the callback URL returned
-# by pyngrok, allowing for full end-to-end service in dev
+# Update any base URLs or webhooks to use the public ngrok URL
 if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN and TWILIO_SMS_NUMBER:
     callback_url = "{}/inbound".format(public_url)
 
