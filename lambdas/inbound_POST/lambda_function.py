@@ -11,7 +11,7 @@ from utils.decoratorutils import conditional_decorator
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2019, Alex Laird"
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 
@@ -60,7 +60,7 @@ def lambda_handler(event, context):
     try:
         response = requests.get(
             "{}/aqi?zipCode={}".format(AIR_QUALITY_API_URL, zip_code, timeout=_AIR_QUALITY_API_TIMEOUT)).json()
-    except requests.exceptions.ConnectionError as e:
+    except requests.exceptions.RequestException as e:
         metricutils.increment("inbound_POST.error.aqi-request-failed")
         logger.error(e)
 

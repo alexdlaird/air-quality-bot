@@ -16,7 +16,7 @@ from utils.decoratorutils import conditional_decorator
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2019, Alex Laird"
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")
@@ -174,7 +174,7 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
             logger.info("DynamoDB ZipCode write response: {}".format(db_zip_write))
         else:
             logger.info("AirNow data is unavailable for this zip code, not caching")
-    except requests.exceptions.ConnectionError as e:
+    except requests.exceptions.RequestException as e:
         metricutils.increment("aqi_GET.airnowapi-connection")
         logger.error(e)
 
