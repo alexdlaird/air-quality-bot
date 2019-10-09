@@ -175,7 +175,7 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
         else:
             logger.info("AirNow data is unavailable for this zip code, not caching")
     except requests.exceptions.RequestException as e:
-        metricutils.increment("aqi_GET.airnowapi-connection")
+        metricutils.increment("aqi_GET.warn.airnowapi-connection")
         logger.error(e)
 
         if retries < _AIRNOW_API_RETRIES:
@@ -186,6 +186,8 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
 
             _airnow_api_request(zip_code, utc_dt, data, retries + 1)
         elif data is not None:
+            metricutils.increment("aqi_GET.warn.airnowapi-zip-code-cache-fallback")
+
             logger.info("AirNow API request timed out, falling back to cached value.")
     except ValueError as e:
         metricutils.increment("aqi_GET.error.airnowapi-response")
@@ -257,7 +259,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
             except requests.exceptions.ConnectionError as e:
                 # We don't retry these as they're expensive and infrequent, and
                 # once we have the URL for the ReportingArea map, it doesn't expire
-                metricutils.increment("aqi_GET.error.airnow-connection")
+                metricutils.increment("aqi_GET.warn.airnow-connection")
                 logger.error(e)
 
                 logger.info("AirNow request timed out, map will be unavailable for this ReportingArea")
