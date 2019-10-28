@@ -1,5 +1,7 @@
 #!/bin/bash
 
+AWS_CREDENTIALS_PROFILE="${AWS_CREDENTIALS_PROFILE:-default}"
+
 read_var() {
    VAR=$(grep $1 $2 | xargs)
    IFS="=" read -ra VAR <<< "$VAR"
@@ -25,13 +27,13 @@ deploy() {
   LAMBDA_TIMEOUT=$2
   ENV_VARS=$3
 
-  if aws lambda get-function --function-name $LAMBDA_NAME 2>&1 | grep -q "Function not found"
+  if aws lambda get-function --profile $AWS_CREDENTIALS_PROFILE --function-name $LAMBDA_NAME 2>&1 | grep -q "Function not found"
   then
-    aws lambda create-function --function-name $LAMBDA_NAME --runtime python3.6 --role $AWS_ROLE --handler lambda_function.lambda_handler --zip-file fileb://$LAMBDA_NAME.zip
+    aws lambda create-function --profile $AWS_CREDENTIALS_PROFILE --function-name $LAMBDA_NAME --runtime python3.6 --role $AWS_ROLE --handler lambda_function.lambda_handler --zip-file fileb://$LAMBDA_NAME.zip || exit
   else
-    aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip
+    aws lambda update-function-code --profile $AWS_CREDENTIALS_PROFILE --function-name $LAMBDA_NAME --zip-file fileb://$LAMBDA_NAME.zip || exit
   fi
-  aws lambda update-function-configuration --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS --layers "arn:aws:lambda:$DYNAMODB_REGION:464622532012:layer:Datadog-Python36-metric:1"
+  aws lambda update-function-configuration --profile $AWS_CREDENTIALS_PROFILE --function-name $LAMBDA_NAME --timeout $LAMBDA_TIMEOUT --environment $ENV_VARS --layers "arn:aws:lambda:$DYNAMODB_REGION:464622532012:layer:Datadog-Python36:8"
 }
 
 ###########################################################
@@ -53,10 +55,10 @@ TRAVIS_ACCESS_TOKEN=$(read_var TRAVIS_ACCESS_TOKEN .env)
 # Initialize AWS environment
 ###########################################################
 
-if ! aws dynamodb list-tables 2>&1 | grep -q "$DYNAMODB_AQI_TABLE"
+if ! aws dynamodb list-tables --profile $AWS_CREDENTIALS_PROFILE 2>&1 | grep -q "$DYNAMODB_AQI_TABLE"
 then
-  aws dynamodb create-table --table-name $DYNAMODB_AQI_TABLE --attribute-definitions AttributeName=PartitionKey,AttributeType=S --key-schema AttributeName=PartitionKey,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
-  aws dynamodb wait table-exists --table-name $DYNAMODB_AQI_TABLE
+  aws dynamodb create-table --profile $AWS_CREDENTIALS_PROFILE --table-name $DYNAMODB_AQI_TABLE --attribute-definitions AttributeName=PartitionKey,AttributeType=S --key-schema AttributeName=PartitionKey,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 || exit
+  aws dynamodb wait table-exists --profile $AWS_CREDENTIALS_PROFILE --table-name $DYNAMODB_AQI_TABLE
 fi
 
 ###########################################################
