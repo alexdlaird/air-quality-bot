@@ -8,7 +8,7 @@ from .testcase import TestCase
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.4"
+__version__ = "0.1.7"
 
 
 class TestCaseAQI(TestCase):
@@ -18,7 +18,11 @@ class TestCaseAQI(TestCase):
         self.given_dynamo_table_exists()
         self.given_airnow_routes_mocked()
 
-        event = {"zipCode": "52328"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "52328"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -31,7 +35,11 @@ class TestCaseAQI(TestCase):
         self.given_dynamo_table_exists()
         self.given_airnow_routes_mocked()
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -54,7 +62,11 @@ class TestCaseAQI(TestCase):
         zip_code_data = self.given_zip_code_cached(last_updated)
         self.given_reporting_area_cached(last_updated, zip_code_data)
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -76,7 +88,11 @@ class TestCaseAQI(TestCase):
         last_updated = datetime.utcnow().isoformat()
         self.given_zip_code_cached(last_updated)
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -96,7 +112,11 @@ class TestCaseAQI(TestCase):
         last_updated = (datetime.utcnow() - timedelta(hours=1, minutes=1)).isoformat()
         self.given_zip_code_cached(last_updated)
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -115,7 +135,11 @@ class TestCaseAQI(TestCase):
         last_updated = (datetime.utcnow() - timedelta(hours=1, minutes=1)).isoformat()
         self.given_zip_code_cached(last_updated)
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -137,7 +161,11 @@ class TestCaseAQI(TestCase):
         zip_code_data["LastUpdated"] = reporting_area_last_updated
         self.given_reporting_area_cached(reporting_area_last_updated, zip_code_data)
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -155,7 +183,11 @@ class TestCaseAQI(TestCase):
         self.given_dynamo_table_exists()
         self.given_airnow_api_server_error()
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -169,7 +201,11 @@ class TestCaseAQI(TestCase):
         self.given_dynamo_table_exists()
         self.given_airnow_api_bad_response()
 
-        event = {"zipCode": "94501"}
+        event = {
+            "params": {
+                "querystring": {"zipCode": "94501"},
+            },
+        }
 
         response = lambda_function.lambda_handler(event, {})
 

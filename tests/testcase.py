@@ -11,7 +11,7 @@ from utils.jsonutils import decimal_default
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.5"
+__version__ = "0.1.7"
 
 
 class TestCase(unittest.TestCase):
@@ -100,7 +100,9 @@ class TestCase(unittest.TestCase):
         def _aqi_request_callback(request):
             parsed = urlparse.urlparse(request.url)
             event = {
-                "zipCode": urlparse.parse_qs(parsed.query)["zipCode"][0]
+                "params": {
+                    "querystring": {"zipCode": urlparse.parse_qs(parsed.query)["zipCode"][0]},
+                },
             }
 
             return (200, {}, json.dumps(aqi_route.lambda_handler(event, {}), default=decimal_default))
