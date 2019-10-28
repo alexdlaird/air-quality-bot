@@ -96,15 +96,8 @@ to execute on this method
   - Edit the "GET" method's "Method Request"
     - Change the "Request Validator" to "Validate query string parameters and header"
     - Add a required "URL Query String Parameter" of `zipCode`
-
-Under the "Integration Request", under "Mapping Templates" of "Content-Type" of `application/json`,
-put the following template:
-
-```json
-{
-    "zipCode":  "$input.params('zipCode')"
-}
-```
+    - Edit the "GET" method's "Integration Request"
+          - Under "Mapping Templates", add a "Content-Type" of `application/json` using the "General template" of "Method Request Passthrough"
 
 Deploy the new API Gateway. Note the newly generated `Invoke URL` and update the
 `AIR_QUALITY_API_URL` variable in `.env`, then redeploy your Lambdas by running

@@ -16,7 +16,7 @@ from utils.decoratorutils import conditional_decorator
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2019, Alex Laird"
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")
@@ -42,11 +42,14 @@ table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
 @conditional_decorator(datadog_lambda_wrapper, not os.environ.get("FLASK_APP", None))
 def lambda_handler(event, context):
-    metricutils.increment("aqi_GET.request")
-
     logger.info("Event: {}".format(event))
 
-    zip_code = event["zipCode"]
+    query_string = event["params"]["querystring"]
+    logger.info("Query String: {}".format(query_string))
+
+    metricutils.increment("aqi_GET.request")
+
+    zip_code = query_string["zipCode"]
 
     utc_dt = datetime.utcnow()
 

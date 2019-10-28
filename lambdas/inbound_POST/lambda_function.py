@@ -11,7 +11,7 @@ from utils.decoratorutils import conditional_decorator
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2019, Alex Laird"
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 
@@ -31,9 +31,12 @@ logger.setLevel(logging.INFO)
 
 @conditional_decorator(datadog_lambda_wrapper, not os.environ.get("FLASK_APP", None))
 def lambda_handler(event, context):
-    metricutils.increment("inbound_POST.request")
-
     logger.info("Event: {}".format(event))
+
+    query_string = event["params"]["querystring"]
+    logger.info("Query String: {}".format(query_string))
+
+    metricutils.increment("inbound_POST.request")
 
     data = parse.parse_qs(event["body-json"])
     phone_number = data["From"][0]
