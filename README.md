@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/alexdlaird/air-quality-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/air-quality-bot)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/alexdlaird)
 
 # Air Quality Bot
 
