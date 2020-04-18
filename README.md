@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/alexdlaird/air-quality-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/air-quality-bot)
-[![codecov](https://codecov.io/gh/alexdlaird/air-quality-bot/branch/master/graph/badge.svg)](https://codecov.io/gh/alexdlaird/air-quality-bot)
 ![GitHub](https://img.shields.io/github/license/alexdlaird/air-quality-bot)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/alexdlaird)
 
