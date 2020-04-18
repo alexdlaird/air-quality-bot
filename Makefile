@@ -24,7 +24,8 @@ install: env virtualenv
 test: env virtualenv
 	@( \
 		source .venv/bin/activate; \
-		export $$(cat .env | grep -v ^\# | xargs) && python -m unittest discover; \
+		export $$(cat .env | grep -v ^\# | xargs) && coverage run -m unittest discover; \
+		coverage html; \
 	)
 
 run-devserver: env virtualenv
