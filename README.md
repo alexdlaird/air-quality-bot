@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/alexdlaird/air-quality-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/air-quality-bot)
-![GitHub](https://img.shields.io/github/license/alexdlaird/air-quality-bot)
 ![image](https://img.shields.io/badge/python-%203.6%20|%203.7%20|%203.8%20-blue)
+![GitHub](https://img.shields.io/github/license/alexdlaird/air-quality-bot)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/alexdlaird)
 
 # Air Quality Bot
