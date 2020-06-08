@@ -7,6 +7,6 @@ flask==1.1.2
 pyngrok==1.4.2
 twilio==6.23.1
 responses==0.10.14
-datadog==0.30.0
+datadog==0.36.0
 coverage==5.1
 codecov==2.0.22
