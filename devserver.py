@@ -17,7 +17,7 @@ from utils.jsonutils import decimal_default
 
 load_dotenv(dotenv_path=".env.dev")
 
-# Mock DynamoDB calls with an in-memory datastore
+# Mock DynamoDB calls with an in-memory datastore before importing the handlers
 mock = mock_dynamodb2()
 mock.start()
 
@@ -49,7 +49,7 @@ from lambdas.inbound_POST import lambda_function as inbound_route
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2019, Alex Laird"
-__version__ = "0.1.5"
+__version__ = "0.1.8"
 
 LOGGING = {
     "version": 1,

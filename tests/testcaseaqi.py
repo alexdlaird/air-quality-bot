@@ -1,3 +1,4 @@
+import unittest
 from datetime import datetime, timedelta
 
 import responses
@@ -8,7 +9,7 @@ from .testcase import TestCase
 
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 
 class TestCaseAQI(TestCase):

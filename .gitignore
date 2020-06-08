@@ -8,3 +8,4 @@
 lib
 _build
 .coverage
+coverage.xml
