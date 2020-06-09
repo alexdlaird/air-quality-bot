@@ -4,7 +4,7 @@ botocore==1.16.25
 requests==2.23.0
 python-dotenv==0.13.0
 flask==1.1.2
-pyngrok==3.1.1
+pyngrok==4.0.0
 twilio==6.41.0
 responses==0.10.14
 datadog==0.36.0
