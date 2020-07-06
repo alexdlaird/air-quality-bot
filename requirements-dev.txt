@@ -8,5 +8,5 @@ pyngrok==4.1.3
 twilio==6.43.0
 responses==0.10.15
 datadog==0.38.0
-coverage==5.1
+coverage==5.2
 codecov==2.1.7
