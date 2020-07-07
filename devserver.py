@@ -73,16 +73,10 @@ LOGGING = {
 }
 dictConfig(LOGGING)
 
+USE_NGROK = os.environ.get("WERKZEUG_RUN_MAIN") != "true"
+
 # Initialize the Flask app for a simple web server
 app = Flask(__name__)
-
-# Get the dev server port (defaults to 5000 for Flask, can be overridden with `--port`
-# when starting the server
-port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 5000
-
-# Open a ngrok tunnel to the dev server
-public_url = ngrok.connect(port)
-print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}/\"".format(public_url, port))
 
 # Calling mock_dynamodb2() above hijacked the requests library, so using the responses
 # library (that moto also used), add passthrus for HTTP requests that should still
@@ -92,17 +86,26 @@ responses.add_passthru("https://api.twilio.com")
 responses.add_passthru("http://www.airnowapi.org")
 responses.add_passthru("https://airnow.gov")
 
-TWILIO_ACCOUNT_SID = os.environ.get("AIR_QUALITY_DEV_TWILIO_ACCOUNT_SID", None)
-TWILIO_AUTH_TOKEN = os.environ.get("AIR_QUALITY_DEV_TWILIO_AUTH_TOKEN", None)
-TWILIO_SMS_NUMBER = os.environ.get("AIR_QUALITY_DEV_TWILIO_SMS_NUMBER", None)
+if USE_NGROK:
+    # Get the dev server port (defaults to 5000 for Flask, can be overridden with `--port`
+    # when starting the server
+    port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 5000
 
-# Update any base URLs or webhooks to use the public ngrok URL
-if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN and TWILIO_SMS_NUMBER:
-    callback_url = "{}/inbound".format(public_url)
+    # Open a ngrok tunnel to the dev server
+    public_url = ngrok.connect(port)
+    print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}/\"".format(public_url, port))
 
-    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-    phone_number_sid = client.incoming_phone_numbers.list(phone_number=TWILIO_SMS_NUMBER)[0].sid
-    client.incoming_phone_numbers(phone_number_sid).update(sms_url=callback_url)
+    TWILIO_ACCOUNT_SID = os.environ.get("AIR_QUALITY_DEV_TWILIO_ACCOUNT_SID", None)
+    TWILIO_AUTH_TOKEN = os.environ.get("AIR_QUALITY_DEV_TWILIO_AUTH_TOKEN", None)
+    TWILIO_SMS_NUMBER = os.environ.get("AIR_QUALITY_DEV_TWILIO_SMS_NUMBER", None)
+
+    # Update any base URLs or webhooks to use the public ngrok URL
+    if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN and TWILIO_SMS_NUMBER:
+        callback_url = "{}/inbound".format(public_url)
+
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        phone_number_sid = client.incoming_phone_numbers.list(phone_number=TWILIO_SMS_NUMBER)[0].sid
+        client.incoming_phone_numbers(phone_number_sid).update(sms_url=callback_url)
 
 
 ###################################################################################

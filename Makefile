@@ -31,5 +31,5 @@ test: env virtualenv
 run-devserver: env virtualenv
 	@( \
 		source .venv/bin/activate; \
-		FLASK_SKIP_DOTENV=1 FLASK_APP=devserver.py flask run; \
+		FLASK_SKIP_DOTENV=1 FLASK_ENV=development FLASK_APP=devserver.py flask run; \
 	)
