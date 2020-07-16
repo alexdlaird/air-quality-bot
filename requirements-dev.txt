@@ -9,4 +9,4 @@ twilio==6.44.0
 responses==0.10.15
 datadog==0.38.0
 coverage==5.2
-codecov==2.1.7
+codecov==2.1.8
