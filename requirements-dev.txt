@@ -1,6 +1,6 @@
 moto==1.3.14
 botocore==1.17.22
-boto3==1.14.21
+boto3==1.14.22
 requests==2.24.0
 python-dotenv==0.14.0
 flask==1.1.2
