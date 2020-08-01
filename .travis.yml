@@ -15,4 +15,5 @@ install:
 script:
   - make test
 after_success:
+  - source .venv/bin/activate
   - codecov
