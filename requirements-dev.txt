@@ -6,7 +6,7 @@ python-dotenv==0.14.0
 flask==1.1.2
 pyngrok==4.1.10
 twilio==6.45.0
-responses==0.10.16
+responses==0.11.0
 datadog==0.38.0
 coverage==5.2.1
 codecov==2.1.8
