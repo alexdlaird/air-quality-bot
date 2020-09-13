@@ -1,4 +1,4 @@
-<p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://raw.githubusercontent.com/alexdlaird/air-quality-bot/master/logo.png" /></p>
+<p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://www.alexlaird.com/content/uploads/2020/09/logo-2.png" /></p>
 
 [![Build Status](https://travis-ci.org/alexdlaird/air-quality-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/air-quality-bot)
 [![codecov](https://codecov.io/gh/alexdlaird/air-quality-bot/branch/master/graph/badge.svg)](https://codecov.io/gh/alexdlaird/air-quality-bot)
