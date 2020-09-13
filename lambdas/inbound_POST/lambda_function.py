@@ -10,8 +10,8 @@ from utils import metricutils
 from utils.decoratorutils import conditional_decorator
 
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2019, Alex Laird"
-__version__ = "0.1.7"
+__copyright__ = "Copyright 2020, Alex Laird"
+__version__ = "1.0.0"
 
 AIR_QUALITY_API_URL = os.environ.get("AIR_QUALITY_API_URL").lower()
 

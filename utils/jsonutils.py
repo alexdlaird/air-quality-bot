@@ -1,7 +1,7 @@
 import decimal
 
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2019, Alex Laird"
+__copyright__ = "Copyright 2020, Alex Laird"
 __version__ = "0.1.5"
 
 

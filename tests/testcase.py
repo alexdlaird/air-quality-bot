@@ -5,13 +5,16 @@ import urllib.parse as urlparse
 
 import boto3
 import responses
+from dotenv import load_dotenv
 
 from lambdas.aqi_GET import lambda_function as aqi_route
 from utils.jsonutils import decimal_default
 
+load_dotenv(dotenv_path=".env")
+
 __author__ = "Alex Laird"
 __copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.7"
+__version__ = "1.0.0"
 
 
 class TestCase(unittest.TestCase):

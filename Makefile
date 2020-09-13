@@ -24,8 +24,7 @@ install: env virtualenv
 test: env virtualenv
 	@( \
 		source .venv/bin/activate; \
-		export $$(cat .env | grep -v ^\# | xargs) && coverage run -m unittest discover; \
-		coverage html; \
+		python `which nosetests` -s --with-coverage --cover-erase --cover-package=. --cover-html --cover-html-dir=_build/coverage; \
 	)
 
 run-devserver: env virtualenv

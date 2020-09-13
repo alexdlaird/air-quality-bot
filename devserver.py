@@ -48,8 +48,8 @@ from lambdas.aqi_GET import lambda_function as aqi_route
 from lambdas.inbound_POST import lambda_function as inbound_route
 
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2019, Alex Laird"
-__version__ = "0.1.8"
+__copyright__ = "Copyright 2020, Alex Laird"
+__version__ = "1.0.0"
 
 LOGGING = {
     "version": 1,
