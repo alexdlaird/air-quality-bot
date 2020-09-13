@@ -1,10 +1,11 @@
+<p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://raw.githubusercontent.com/alexdlaird/air-quality-bot/master/logo.png" /></p>
+
 [![Build Status](https://travis-ci.org/alexdlaird/air-quality-bot.svg?branch=master)](https://travis-ci.org/alexdlaird/air-quality-bot)
 [![codecov](https://codecov.io/gh/alexdlaird/air-quality-bot/branch/master/graph/badge.svg)](https://codecov.io/gh/alexdlaird/air-quality-bot)
 ![image](https://img.shields.io/badge/python-%203.6%20|%203.7%20|%203.8%20-blue)
 ![GitHub](https://img.shields.io/github/license/alexdlaird/air-quality-bot)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/alexdlaird)
-
-# Air Quality Bot
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Text+your+zip+code+to+%28415%29+212-4229%2C+and+optionally+%E2%80%9Cmap%E2%80%9D%2C+and+it%E2%80%99ll+respond+with+the+current+air+quality+for+your+region.%0D%0A%0D%0AStay+safe+everyone.%0D%0A%0D%0A&url=https://github.com/alexdlaird/air-quality-bot&via=alexdlaird+@twilio&hashtags=Twilio,TwilioFunctions,AirNow,AirQuality,AQI)
 
 The Air Quality Bot is generally available by texting a zip code (and optionally
 the word "map") to (415) 212-4229. The bot will respond with the latest air
