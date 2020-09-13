@@ -118,8 +118,8 @@ That's it! Your bot is now setup and ready to respond to texts.
 
 ## Local Development
 
-To test the bot locally, simple [Flask](http://flask.pocoo.org/) server is included in `devserver.py`.
-Ensure proper `dev` values are in `.env.dev`, then execute:
+To test the bot locally, simple [Flask](https://flask.palletsprojects.com/en/1.1.x) server is included in
+`devserver.py`. Ensure proper `dev` values are in `.env.dev`, then execute:
 
 ```sh
 make run-devserver

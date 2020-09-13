@@ -121,7 +121,11 @@ if USE_NGROK:
 @app.route("/aqi")
 def route_aqi():
     event = {
-        "zipCode": request.args.get("zipCode")
+        "params": {
+            "querystring": {
+                "zipCode": request.args.get("zipCode")
+            }
+        }
     }
 
     return json.dumps(aqi_route.lambda_handler(event, {}), default=decimal_default)
