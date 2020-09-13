@@ -1,7 +1,9 @@
 [run]
 omit =
+    devserver.py
     .venv/**
     */tests/**
+    */lib/**
 
 [report]
 precision = 2

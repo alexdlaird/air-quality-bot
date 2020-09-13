@@ -7,13 +7,13 @@ import boto3
 import responses
 from dotenv import load_dotenv
 
+load_dotenv(dotenv_path=".env")
+
 from lambdas.aqi_GET import lambda_function as aqi_route
 from utils.jsonutils import decimal_default
 
-load_dotenv(dotenv_path=".env")
-
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2018, Alex Laird"
+__copyright__ = "Copyright 2020, Alex Laird"
 __version__ = "1.0.0"
 
 

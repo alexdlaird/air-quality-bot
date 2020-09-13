@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 import responses
 from moto import mock_dynamodb2
 
-from lambdas.aqi_GET import lambda_function
 from .testcase import TestCase
+from lambdas.aqi_GET import lambda_function
 
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.8"
+__copyright__ = "Copyright 2020, Alex Laird"
+__version__ = "1.0.0"
 
 
 class TestCaseAQI(TestCase):

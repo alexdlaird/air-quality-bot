@@ -7,8 +7,8 @@ from lambdas.inbound_POST import lambda_function
 from .testcase import TestCase
 
 __author__ = "Alex Laird"
-__copyright__ = "Copyright 2018, Alex Laird"
-__version__ = "0.1.4"
+__copyright__ = "Copyright 2020, Alex Laird"
+__version__ = "1.0.0"
 
 
 class TestCaseInbound(TestCase):
