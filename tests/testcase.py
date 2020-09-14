@@ -7,7 +7,7 @@ import boto3
 import responses
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=".env")
+load_dotenv(dotenv_path=".env.dev")
 
 from lambdas.aqi_GET import lambda_function as aqi_route
 from utils.jsonutils import decimal_default
