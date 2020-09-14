@@ -77,9 +77,9 @@ def lambda_handler(event, context):
                 # If the ReportingArea's CachedAQI is more recent than the ZipCode value (i.e. the cache is old and a new
                 # request failed), fallback to the ReportArea's cache (assuming it isn't more than a day old)
                 if parser.parse(reporting_area_data["LastUpdated"]) > parser.parse(zip_code_data["LastUpdated"]) and \
-                                "CachedAQI" in reporting_area_data and \
-                                parser.parse(reporting_area_data["CachedAQI"]["LastUpdated"]) < utc_dt + timedelta(
-                            hours=24):
+                        "CachedAQI" in reporting_area_data and \
+                        parser.parse(reporting_area_data["CachedAQI"]["LastUpdated"]) < utc_dt + timedelta(
+                    hours=24):
                     metricutils.increment("aqi_GET.reporting-area-cache-fallback")
                     logger.info("ReportingArea cached data is more recent, using that")
 
@@ -212,7 +212,7 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
 
     data = None
     if "Item" not in db_reporting_area_read or (
-                utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
+            utc_dt - parser.parse(db_reporting_area_read["Item"]["LastUpdated"])).total_seconds() > 3600:
         if "Item" in db_reporting_area_read and parser.parse(zip_code_data["LastUpdated"]) > parser.parse(
                 db_reporting_area_read["Item"]["LastUpdated"]):
             metricutils.increment("aqi_GET.airnow-request")
