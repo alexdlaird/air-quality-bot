@@ -107,5 +107,5 @@ then
      -H "Travis-API-Version: 3" \
      -H "Authorization: token $TRAVIS_ACCESS_TOKEN" \
      -d "$body" \
-     https://api.travis-ci.org/repo/"$TRAVIS_E2E_REPO"/requests
+     https://api.travis-ci.com/repo/"$TRAVIS_E2E_REPO"/requests
 fi
