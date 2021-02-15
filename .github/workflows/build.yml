@@ -11,6 +11,11 @@ jobs:
   build:
     name: Build
 
+    env:
+      AWS_ACCESS_KEY_ID: dummy-access-key
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_SECRET_ACCESS_KEY: dummy-access-key-secret
+
     strategy:
       fail-fast: false
       matrix:
