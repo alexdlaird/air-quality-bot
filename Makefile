@@ -24,7 +24,7 @@ install: env virtualenv
 test: env virtualenv
 	@( \
 		source .venv/bin/activate; \
-		python `which nosetests` -s --with-coverage --cover-erase --cover-package=. --cover-html --cover-html-dir=_build/coverage; \
+		python `which nosetests` --with-coverage --cover-erase --cover-package=. --cover-xml --cover-xml-file=_build/coverage/coverage.xml --cover-html --cover-html-dir=_build/coverage; \
 	)
 
 run-devserver: env virtualenv
