@@ -25,12 +25,11 @@ jobs:
         with:
           python-version: 3.x
       - name: Install dependencies
-        run: |
+        run:
           make install
       - name: Run tests
-        run: |
+        run:
           make test
-        shell: bash
       - name: Upload coverage
         uses: codecov/codecov-action@v1
         with:
