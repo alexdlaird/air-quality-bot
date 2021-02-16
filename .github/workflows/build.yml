@@ -16,20 +16,14 @@ jobs:
       AWS_DEFAULT_REGION: us-east-1
       AWS_SECRET_ACCESS_KEY: dummy-access-key-secret
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest ]
-        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.x
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.x
       - name: Install dependencies
         run: |
           make install
@@ -38,7 +32,6 @@ jobs:
           make test
         shell: bash
       - name: Upload coverage
-        if: matrix.python-version == '3.9'
         uses: codecov/codecov-action@v1
         with:
           directory: ./_build/coverage
