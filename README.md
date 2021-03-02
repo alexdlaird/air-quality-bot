@@ -1,7 +1,7 @@
 <p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://www.alexlaird.com/content/uploads/2020/09/logo-2.png" /></p>
 
 [![CI/CD](https://github.com/alexdlaird/air-quality-bot/workflows/CI/CD/badge.svg)](https://github.com/alexdlaird/air-quality-bot/actions?query=workflow%3ACI%2FCD)
-[![Codecov](https://codecov.io/gh/alexdlaird/air-quality-bot/branch/master/graph/badge.svg)](https://codecov.io/gh/alexdlaird/air-quality-bot)
+[![Codecov](https://codecov.io/gh/alexdlaird/air-quality-bot/branch/main/graph/badge.svg)](https://codecov.io/gh/alexdlaird/air-quality-bot)
 ![Python Versions](https://img.shields.io/badge/python-%203.6%20|%203.7%20|%203.8%20-blue)
 ![GitHub License](https://img.shields.io/github/license/alexdlaird/air-quality-bot)
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Text+your+zip+code+to+the+%23AirQualityBot+at+%28415%29+212-4229%2C+and+optionally+add+%E2%80%9Cmap%E2%80%9D%2C+and+it%E2%80%99ll+respond+with+the+current+%23airquality+for+your+region.%0D%0A%0D%0AStay+safe+everyone.%0D%0A%0D%0A&url=https://github.com/alexdlaird/air-quality-bot&via=alexdlaird+@twilio&hashtags=Twilio,TwilioFunctions,AirNow,AQI)
