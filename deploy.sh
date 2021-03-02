@@ -48,8 +48,6 @@ DYNAMODB_REGION=$(read_var DYNAMODB_REGION .env)
 DYNAMODB_AQI_TABLE=$(read_var DYNAMODB_AQI_TABLE .env)
 DATADOG_API_KEY=$(read_var DATADOG_API_KEY .env)
 DATADOG_APP_KEY=$(read_var DATADOG_APP_KEY .env)
-TRAVIS_E2E_REPO=$(read_var TRAVIS_E2E_REPO .env)
-TRAVIS_ACCESS_TOKEN=$(read_var TRAVIS_ACCESS_TOKEN .env)
 
 ###########################################################
 # Initialize AWS environment
@@ -94,18 +92,4 @@ deploy $LAMBDA_NAME $LAMBDA_TIMEOUT "$ENV_VARS"
 # Trigger E2E Tests
 ###########################################################
 
-if [ -n "$TRAVIS_ACCESS_TOKEN" ] && [ -n "$TRAVIS_E2E_REPO" ];
-then
-  body='{
-  "request": {
-  "branch":"master"
-  }}'
-
-  curl -s -X POST \
-     -H "Content-Type: application/json" \
-     -H "Accept: application/json" \
-     -H "Travis-API-Version: 3" \
-     -H "Authorization: token $TRAVIS_ACCESS_TOKEN" \
-     -d "$body" \
-     https://api.travis-ci.com/repo/"$TRAVIS_E2E_REPO"/requests
-fi
+# TODO: needs to be udpated with GitHub Actions
