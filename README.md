@@ -129,9 +129,9 @@ and it will also start a [ngrok](https://ngrok.com/) tunnel using
 [pyngrok](https://github.com/alexdlaird/pyngrok) so the bot can be fully tested
 end-to-end.
 
-## Travis Build
+## CI Build
 
-If you would like the project to build for you in Travis (or similar), you may
+If you would like the project to build for you in a CI system, you may
 need to add the following environment variables to the CI's console. Their
 actual values do not matter (use dummy values, not real), but certain versions
 of the `boto` dependency need them to be present when initializing its
