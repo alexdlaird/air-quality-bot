@@ -95,24 +95,14 @@ def lambda_handler(event, context):
             response[parameter_name]["HourObserved"]
         time = str(int(12 if time == "00" else time)) + suffix + " " + response[parameter_name]["LocalTimeZone"]
 
-        if parameter_name in ["PM2.5", "PM10"]:
-            msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(
-                response[parameter_name]["Category"]["Name"],
-                int(response[parameter_name]["AQI"]),
-                parameter_name,
-                response[parameter_name]["ReportingArea"], time,
-                _AQI_MESSAGES[
-                    response[parameter_name]["Category"][
-                        "Name"]])
-        else:
-            msg = "{} air quality for {} at {}. {}\nSource: AirNow".format(
-                response[parameter_name]["Category"]["Name"],
-                parameter_name,
-                response[parameter_name]["ReportingArea"],
-                time,
-                _AQI_MESSAGES[
-                    response[parameter_name]["Category"][
-                        "Name"]])
+        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(
+            response[parameter_name]["Category"]["Name"],
+            int(response[parameter_name]["AQI"]),
+            parameter_name,
+            response[parameter_name]["ReportingArea"], time,
+            _AQI_MESSAGES[
+                response[parameter_name]["Category"][
+                    "Name"]])
 
         media = None
         if include_map:
