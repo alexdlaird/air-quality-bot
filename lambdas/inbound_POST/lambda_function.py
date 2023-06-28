@@ -81,6 +81,8 @@ def lambda_handler(event, context):
         parameter_name = "PM2.5"
     elif "PM10" in response:
         parameter_name = "PM10"
+    elif "O3" in response:
+        parameter_name = "O3"
 
     if parameter_name is None:
         metricutils.increment("inbound_POST.error.no-pm")
@@ -93,13 +95,24 @@ def lambda_handler(event, context):
             response[parameter_name]["HourObserved"]
         time = str(int(12 if time == "00" else time)) + suffix + " " + response[parameter_name]["LocalTimeZone"]
 
-        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(response[parameter_name]["Category"]["Name"],
-                                                                        int(response[parameter_name]["AQI"]),
-                                                                        parameter_name,
-                                                                        response[parameter_name]["ReportingArea"], time,
-                                                                        _AQI_MESSAGES[
-                                                                            response[parameter_name]["Category"][
-                                                                                "Name"]])
+        if parameter_name in ["PM2.5", "PM10"]:
+            msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(
+                response[parameter_name]["Category"]["Name"],
+                int(response[parameter_name]["AQI"]),
+                parameter_name,
+                response[parameter_name]["ReportingArea"], time,
+                _AQI_MESSAGES[
+                    response[parameter_name]["Category"][
+                        "Name"]])
+        else:
+            msg = "{} air quality for {} at {}. {}\nSource: AirNow".format(
+                response[parameter_name]["Category"]["Name"],
+                parameter_name,
+                response[parameter_name]["ReportingArea"],
+                time,
+                _AQI_MESSAGES[
+                    response[parameter_name]["Category"][
+                        "Name"]])
 
         media = None
         if include_map:
