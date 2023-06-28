@@ -106,11 +106,11 @@ def lambda_handler(event, context):
 
         media = None
         if include_map:
-            if "MapUrl" in response[parameter_name]:
-                media = response[parameter_name]["MapUrl"]
-            else:
-                metricutils.increment("inbound_POST.warn.map-request-failed")
-                logger.info("Map requested but not included, no MapUrl provided from AirNow")
+            # if "MapUrl" in response[parameter_name]:
+            media = "https://gispub.epa.gov/airnow/images/current-pm-ozone.jpg" #response[parameter_name]["MapUrl"]
+            # else:
+            #     metricutils.increment("inbound_POST.warn.map-request-failed")
+            #     logger.info("Map requested but not included, no MapUrl provided from AirNow")
 
         return _get_response(msg, media)
 
