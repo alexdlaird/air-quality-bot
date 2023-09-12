@@ -24,7 +24,7 @@ DYNAMODB_AQI_TABLE = os.environ.get("DYNAMODB_AQI_TABLE")
 
 AIRNOW_API_KEYS = json.loads(os.environ.get("AIRNOW_API_KEYS"))
 AIRNOW_API_URL = os.environ.get("AIRNOW_API_URL",
-                                "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={}&distance=25&API_KEY={}")
+                                "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={}&distance=75&API_KEY={}")
 AIRNOW_URL = os.environ.get("AIRNOW_URL", "https://airnow.gov/index.cfm?action=airnow.local_city&zipcode={}&submit=Go")
 AIRNOW_MAP_URL_PREFIX = os.environ.get("AIRNOW_MAP_URL_PREFIX", "https://files.airnowtech.org/airnow/today/")
 
@@ -61,6 +61,8 @@ def lambda_handler(event, context):
             parameter_name = "PM2.5"
         elif "PM10" in zip_code_data:
             parameter_name = "PM10"
+        elif "O3" in zip_code_data:
+            parameter_name = "O3"
 
         if parameter_name is None:
             metricutils.increment("aqi_GET.zip-code-unavailable")
@@ -166,7 +168,7 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
 
             data[parameter["ParameterName"]] = parameter
 
-        if "PM2.5" in data or "PM10" in data:
+        if "PM2.5" in data or "PM10" in data or "O3" in data:
             data["PartitionKey"] = "ZipCode:{}".format(zip_code)
             data["LastUpdated"] = utc_dt.isoformat()
             data["TTL"] = int((utc_dt + timedelta(hours=24) - datetime.fromtimestamp(0)).total_seconds())

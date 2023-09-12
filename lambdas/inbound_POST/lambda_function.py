@@ -81,6 +81,8 @@ def lambda_handler(event, context):
         parameter_name = "PM2.5"
     elif "PM10" in response:
         parameter_name = "PM10"
+    elif "O3" in response:
+        parameter_name = "O3"
 
     if parameter_name is None:
         metricutils.increment("inbound_POST.error.no-pm")
@@ -93,21 +95,22 @@ def lambda_handler(event, context):
             response[parameter_name]["HourObserved"]
         time = str(int(12 if time == "00" else time)) + suffix + " " + response[parameter_name]["LocalTimeZone"]
 
-        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(response[parameter_name]["Category"]["Name"],
-                                                                        int(response[parameter_name]["AQI"]),
-                                                                        parameter_name,
-                                                                        response[parameter_name]["ReportingArea"], time,
-                                                                        _AQI_MESSAGES[
-                                                                            response[parameter_name]["Category"][
-                                                                                "Name"]])
+        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(
+            response[parameter_name]["Category"]["Name"],
+            int(response[parameter_name]["AQI"]),
+            parameter_name,
+            response[parameter_name]["ReportingArea"], time,
+            _AQI_MESSAGES[
+                response[parameter_name]["Category"][
+                    "Name"]])
 
         media = None
         if include_map:
-            if "MapUrl" in response[parameter_name]:
-                media = response[parameter_name]["MapUrl"]
-            else:
-                metricutils.increment("inbound_POST.warn.map-request-failed")
-                logger.info("Map requested but not included, no MapUrl provided from AirNow")
+            # if "MapUrl" in response[parameter_name]:
+            media = "https://gispub.epa.gov/airnow/images/current-pm-ozone.jpg" #response[parameter_name]["MapUrl"]
+            # else:
+            #     metricutils.increment("inbound_POST.warn.map-request-failed")
+            #     logger.info("Map requested but not included, no MapUrl provided from AirNow")
 
         return _get_response(msg, media)
 
