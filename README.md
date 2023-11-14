@@ -149,3 +149,11 @@ can easily be redeployed at any time by rerunning the deploy script:
 ```sh
 ./deploy.sh
 ```
+
+## Contributing
+
+If you would like to get involved, be sure to review the [Contribution Guide](https://github.com/alexdlaird/air-quality-bot/blob/main/CONTRIBUTING.rst).
+
+Want to contribute financially? If you've found `pyngrok` useful, [sponsorship](https://github.com/sponsors/alexdlaird) would
+also be greatly appreciated!
+
