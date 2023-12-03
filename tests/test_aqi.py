@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 
 import responses
-from moto import mock_dynamodb2
+from moto import mock_dynamodb
 
 from .testcase import TestCase
 from lambdas.aqi_GET import lambda_function
@@ -13,7 +13,7 @@ __version__ = "1.0.0"
 
 
 class TestCaseAQI(TestCase):
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_52328(self):
         self.given_dynamo_table_exists()
@@ -30,7 +30,7 @@ class TestCaseAQI(TestCase):
         self.verify_dynamo_key_not_exists("ZipCode:52328")
         self.assertEqual(response, {"errorMessage": "Sorry, AirNow data is unavailable for this zip code."})
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_94501(self):
         self.given_dynamo_table_exists()
@@ -55,7 +55,7 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response["PM2.5"]["MapUrl"],
                          "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg")
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_94501_cached(self):
         self.given_dynamo_table_exists()
@@ -82,7 +82,7 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response["PM2.5"]["MapUrl"],
                          "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg")
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_94501_zip_code_cached_no_map(self):
         self.given_dynamo_table_exists()
@@ -105,7 +105,7 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response["PM2.5"]["AQI"], 25)
         self.assertEqual(response["PM2.5"]["ReportingArea"], "Oakland")
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_94501_zip_code_cache_expired(self):
         self.given_dynamo_table_exists()
@@ -129,7 +129,7 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response["PM2.5"]["AQI"], 15)
         self.assertEqual(response["PM2.5"]["ReportingArea"], "Oakland")
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_94501_zip_code_cache_expired_request_fails_cache_fallback(self):
         self.given_dynamo_table_exists()
@@ -151,7 +151,7 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response["PM2.5"]["AQI"], 25)
         self.assertEqual(response["PM2.5"]["ReportingArea"], "Oakland")
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_94501_zip_code_cache_expired_request_fails_reporting_area_fallback(self):
         self.given_dynamo_table_exists()
@@ -178,7 +178,7 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response["PM2.5"]["AQI"], 100)
         self.assertEqual(response["PM2.5"]["ReportingArea"], "Oakland")
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_air_now_non_200(self):
         self.given_dynamo_table_exists()
@@ -196,7 +196,7 @@ class TestCaseAQI(TestCase):
         self.assertEqual(response,
                          {"errorMessage": "Oops, something went wrong. AirNow seems overloaded at the moment."})
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_aqi_air_now_bad_response(self):
         self.given_dynamo_table_exists()

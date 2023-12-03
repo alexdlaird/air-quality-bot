@@ -1,7 +1,7 @@
 import unittest
 
 import responses
-from moto import mock_dynamodb2
+from moto import mock_dynamodb
 
 from lambdas.inbound_POST import lambda_function
 from .testcase import TestCase
@@ -12,7 +12,7 @@ __version__ = "1.0.0"
 
 
 class TestCaseInbound(TestCase):
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_inbound_94501(self):
         zip_code = "94501"
@@ -29,7 +29,7 @@ class TestCaseInbound(TestCase):
         self.assertTrue("AQI of" in response["body"])
         self.assertTrue("<Media>" not in response["body"])
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_inbound_94501_map(self):
         zip_code = "94501"
@@ -54,7 +54,7 @@ class TestCaseInbound(TestCase):
         self.assertEqual(response, {
             "body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Send us a zip code and we'll reply with the area's Air Quality Index (AQI). Put \"map\" at the end and we'll include the regional map too.</Body></Message></Response>"})
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_inbound_52328(self):
         zip_code = "52328"
@@ -69,7 +69,7 @@ class TestCaseInbound(TestCase):
         self.assertEqual(response, {
             "body": "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>Sorry, AirNow data is unavailable for this zip code.</Body></Message></Response>"})
 
-    @mock_dynamodb2
+    @mock_dynamodb
     @responses.activate
     def test_error_message_response(self):
         zip_code = "94501"

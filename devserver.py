@@ -9,7 +9,7 @@ import responses
 from dotenv import load_dotenv
 from flask import Flask
 from flask import request
-from moto import mock_dynamodb2
+from moto import mock_dynamodb
 from pyngrok import ngrok
 from twilio.rest import Client
 
@@ -18,7 +18,7 @@ from utils.jsonutils import decimal_default
 load_dotenv(dotenv_path=".env.dev")
 
 # Mock DynamoDB calls with an in-memory datastore before importing the handlers
-mock = mock_dynamodb2()
+mock = mock_dynamodb()
 mock.start()
 
 dynamodb = boto3.resource("dynamodb", os.environ.get("DYNAMODB_REGION"))
