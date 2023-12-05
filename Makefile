@@ -18,7 +18,7 @@ install: env virtualenv
 	@( \
 		source .venv/bin/activate; \
 		python -m pip install -r requirements.txt -t ./lib; \
-		python -m pip install -r requirements-dev.txt; \
+		python -m pip install -r requirements.txt -r requirements-dev.txt; \
 	)
 
 test: env virtualenv
