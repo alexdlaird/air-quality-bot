@@ -1,4 +1,3 @@
 requests==2.31.0
 boto3==1.33.7
-botocore==1.33.6
 datadog==0.47.0
