@@ -1,5 +1,5 @@
 moto==4.2.11
-responses==0.24.1
+responses==0.23.1
 pyngrok==7.0.3
 twilio
 python-dotenv
