@@ -1,4 +1,4 @@
-.PHONY: all env virtualenv install test run-devserver
+.PHONY: all env virtualenv install nopyc clean test run-devserver
 
 SHELL := /usr/bin/env bash
 
@@ -20,6 +20,13 @@ install: env virtualenv
 		python -m pip install -r requirements.txt -t ./lib; \
 		python -m pip install -r requirements.txt -r requirements-dev.txt; \
 	)
+
+nopyc:
+	find . -name '*.pyc' | xargs rm -f || true
+	find . -name __pycache__ | xargs rm -rf || true
+
+clean: nopyc
+	rm -rf _build .venv
 
 test: env virtualenv
 	@( \
