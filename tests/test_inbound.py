@@ -20,7 +20,7 @@ class TestCaseInbound(TestCase):
         self.given_api_routes_mocked()
         self.given_airnow_routes_mocked()
 
-        event = self.load_resource("inbound_{}.json".format(zip_code))
+        event = self.load_resource(f"inbound_{zip_code}.json")
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -37,7 +37,7 @@ class TestCaseInbound(TestCase):
         self.given_api_routes_mocked()
         self.given_airnow_routes_mocked()
 
-        event = self.load_resource("inbound_{}_map.json".format(zip_code))
+        event = self.load_resource(f"inbound_{zip_code}_map.json")
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -62,7 +62,7 @@ class TestCaseInbound(TestCase):
         self.given_api_routes_mocked()
         self.given_airnow_routes_mocked()
 
-        event = self.load_resource("inbound_{}.json".format(zip_code))
+        event = self.load_resource(f"inbound_{zip_code}.json")
 
         response = lambda_function.lambda_handler(event, {})
 
@@ -75,7 +75,7 @@ class TestCaseInbound(TestCase):
         zip_code = "94501"
         self.given_dynamo_table_exists()
 
-        event = self.load_resource("inbound_{}.json".format(zip_code))
+        event = self.load_resource(f"inbound_{zip_code}.json")
 
         response = lambda_function.lambda_handler(event, {})
 

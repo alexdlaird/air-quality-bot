@@ -28,13 +28,13 @@ nopyc:
 clean: nopyc
 	rm -rf _build .venv
 
-test: env virtualenv
+test: install
 	@( \
 		source .venv/bin/activate; \
 		python -m coverage run -m unittest discover -v -b && python -m coverage xml -o _build/coverage/coverage.xml; \
 	)
 
-run-devserver: env virtualenv
+run-devserver: install
 	@( \
 		source .venv/bin/activate; \
 		FLASK_SKIP_DOTENV=1 FLASK_ENV=development FLASK_APP=devserver.py flask run; \
