@@ -24,8 +24,9 @@ DYNAMODB_AQI_TABLE = os.environ.get("DYNAMODB_AQI_TABLE")
 
 AIRNOW_API_KEYS = json.loads(os.environ.get("AIRNOW_API_KEYS"))
 AIRNOW_API_URL = os.environ.get("AIRNOW_API_URL",
-                                "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={}&distance=75&API_KEY={}")
-AIRNOW_URL = os.environ.get("AIRNOW_URL", "https://airnow.gov/index.cfm?action=airnow.local_city&zipcode={}&submit=Go")
+                                "http://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode={zip_code}&distance=75&API_KEY={api_key}")
+AIRNOW_URL = os.environ.get("AIRNOW_URL",
+                            "https://airnow.gov/index.cfm?action=airnow.local_city&zipcode={zip_code}&submit=Go")
 AIRNOW_MAP_URL_PREFIX = os.environ.get("AIRNOW_MAP_URL_PREFIX", "https://files.airnowtech.org/airnow/today/")
 
 _AIRNOW_API_TIMEOUT = 2
@@ -42,10 +43,10 @@ table = dynamodb.Table(DYNAMODB_AQI_TABLE)
 
 @conditional_decorator(datadog_lambda_wrapper, not os.environ.get("FLASK_APP", None))
 def lambda_handler(event, context):
-    logger.info("Event: {}".format(event))
+    logger.info(f"Event: {event}")
 
     query_string = event["params"]["querystring"]
-    logger.info("Query String: {}".format(query_string))
+    logger.info(f"Query String: {query_string}")
 
     metricutils.increment("aqi_GET.request")
 
@@ -114,10 +115,10 @@ def lambda_handler(event, context):
 def _get_zip_code_data(zip_code, utc_dt):
     db_zip_read = table.get_item(
         Key={
-            "PartitionKey": "ZipCode:{}".format(zip_code)
+            "PartitionKey": f"ZipCode:{zip_code}"
         }
     )
-    logger.info("DynamoDB ZipCode read response: {}".format(db_zip_read))
+    logger.info(f"DynamoDB ZipCode read response: {db_zip_read}")
 
     data = None
     if "Item" not in db_zip_read or (utc_dt - parser.parse(db_zip_read["Item"]["LastUpdated"])).total_seconds() > 3600:
@@ -145,12 +146,14 @@ def _get_zip_code_data(zip_code, utc_dt):
 def _airnow_api_request(zip_code, utc_dt, data, retries=0):
     airnow_api_key = random.choice(AIRNOW_API_KEYS)
 
-    logger.info("AirNow API URL: {}".format(AIRNOW_API_URL.format(zip_code, airnow_api_key)))
+    url = AIRNOW_API_URL.format(zip_code=zip_code, api_key=airnow_api_key)
+    logger.info(f"AirNow API URL: {url}")
 
     try:
-        response = requests.get(AIRNOW_API_URL.format(zip_code, airnow_api_key), timeout=_AIRNOW_API_TIMEOUT)
+        response = requests.get(AIRNOW_API_URL.format(zip_code=zip_code, api_key=airnow_api_key),
+                                timeout=_AIRNOW_API_TIMEOUT)
 
-        logger.info("AirNow API response: {}".format(response.text))
+        logger.info(f"AirNow API response: {response.text}")
 
         response_json = response.json()
 
@@ -169,14 +172,14 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
             data[parameter["ParameterName"]] = parameter
 
         if "PM2.5" in data or "PM10" in data or "O3" in data:
-            data["PartitionKey"] = "ZipCode:{}".format(zip_code)
+            data["PartitionKey"] = f"ZipCode:{zip_code}"
             data["LastUpdated"] = utc_dt.isoformat()
             data["TTL"] = int((utc_dt + timedelta(hours=24) - datetime.fromtimestamp(0)).total_seconds())
 
             db_zip_write = table.put_item(
                 Item=data
             )
-            logger.info("DynamoDB ZipCode write response: {}".format(db_zip_write))
+            logger.info(f"DynamoDB ZipCode write response: {db_zip_write}")
         else:
             logger.info("AirNow data is unavailable for this zip code, not caching")
     except requests.exceptions.RequestException as e:
@@ -206,11 +209,12 @@ def _airnow_api_request(zip_code, utc_dt, data, retries=0):
 def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
     db_reporting_area_read = table.get_item(
         Key={
-            "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"],
-                                                         zip_code_data[parameter_name]["StateCode"])
+            "PartitionKey": "ReportingArea:{reporting_area}|{status_code}".format(
+                reporting_area=zip_code_data[parameter_name]["ReportingArea"],
+                status_code=zip_code_data[parameter_name]["StateCode"])
         }
     )
-    logger.info("DynamoDB ReportingArea read response: {}".format(db_reporting_area_read))
+    logger.info(f"DynamoDB ReportingArea read response: {db_reporting_area_read}")
 
     data = None
     if "Item" not in db_reporting_area_read or (
@@ -226,8 +230,9 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
 
             db_reporting_area_update = table.update_item(
                 Key={
-                    "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"],
-                                                                 zip_code_data[parameter_name]["StateCode"])
+                    "PartitionKey": "ReportingArea:{reporting_area}|{status_code}".format(
+                        reporting_area=zip_code_data[parameter_name]["ReportingArea"],
+                        status_code=zip_code_data[parameter_name]["StateCode"])
                 },
                 UpdateExpression="set LastUpdated = :dt, CachedAQI = :aqi",
                 ExpressionAttributeValues={
@@ -236,13 +241,13 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                 },
                 ReturnValues="UPDATED_NEW"
             )
-            logger.info("DynamoDB ReportingArea update response: {}".format(db_reporting_area_update))
+            logger.info(f"DynamoDB ReportingArea update response: {db_reporting_area_update}")
         elif "Item" not in db_reporting_area_read:
             logger.info("No ReportingArea value found, querying AirNow for data")
 
             try:
                 metricutils.increment("aqi_GET.airnow-request")
-                response = requests.get(AIRNOW_URL.format(zip_code_data["PartitionKey"][len("ZipCode") + 1:]),
+                response = requests.get(AIRNOW_URL.format(zip_code=zip_code_data["PartitionKey"][len("ZipCode") + 1:]),
                                         timeout=_AIRNOW_TIMEOUT)
 
                 if AIRNOW_MAP_URL_PREFIX in response.text:
@@ -252,15 +257,16 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
                     data = {
                         "MapUrl": map_url,
                         "CachedAQI": zip_code_data.copy(),
-                        "PartitionKey": "ReportingArea:{}|{}".format(zip_code_data[parameter_name]["ReportingArea"],
-                                                                     zip_code_data[parameter_name]["StateCode"]),
+                        "PartitionKey": "ReportingArea:{reporting_area}|{status_code}".format(
+                            reporting_area=zip_code_data[parameter_name]["ReportingArea"],
+                            status_code=zip_code_data[parameter_name]["StateCode"]),
                         "LastUpdated": utc_dt.isoformat()
                     }
 
                     db_reporting_area_write = table.put_item(
                         Item=data
                     )
-                    logger.info("DynamoDB ReportingArea write response: {}".format(db_reporting_area_write))
+                    logger.info(f"DynamoDB ReportingArea write response: {db_reporting_area_write}")
             except requests.exceptions.ConnectionError as e:
                 # We don't retry these as they're expensive and infrequent, and
                 # once we have the URL for the ReportingArea map, it doesn't expire
@@ -273,6 +279,6 @@ def _get_reporting_area_data(zip_code_data, parameter_name, utc_dt):
 
         data = db_reporting_area_read["Item"]
 
-    logger.info("Response data: {}".format(data))
+    logger.info(f"Response data: {data}")
 
     return data

@@ -93,7 +93,7 @@ if USE_NGROK:
 
     # Open a ngrok tunnel to the dev server
     public_url = ngrok.connect(port)
-    print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}/\"".format(public_url, port))
+    print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:{port}/\"")
 
     TWILIO_ACCOUNT_SID = os.environ.get("AIR_QUALITY_DEV_TWILIO_ACCOUNT_SID", None)
     TWILIO_AUTH_TOKEN = os.environ.get("AIR_QUALITY_DEV_TWILIO_AUTH_TOKEN", None)
@@ -101,7 +101,7 @@ if USE_NGROK:
 
     # Update any base URLs or webhooks to use the public ngrok URL
     if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN and TWILIO_SMS_NUMBER:
-        callback_url = "{}/inbound".format(public_url)
+        callback_url = f"{public_url}/inbound"
 
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         phone_number_sid = client.incoming_phone_numbers.list(phone_number=TWILIO_SMS_NUMBER)[0].sid

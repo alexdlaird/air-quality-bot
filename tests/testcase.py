@@ -111,7 +111,7 @@ class TestCase(unittest.TestCase):
             return (200, {}, json.dumps(aqi_route.lambda_handler(event, {}), default=decimal_default))
 
         responses.add_callback(
-            responses.GET, "{}/aqi".format(os.environ.get("AIR_QUALITY_API_URL").lower()),
+            responses.GET, f"{os.environ.get('AIR_QUALITY_API_URL').lower()}/aqi",
             callback=_aqi_request_callback
         )
 
@@ -136,8 +136,7 @@ class TestCase(unittest.TestCase):
             map_url = {
                 "94501": "https://files.airnowtech.org/airnow/today/cur_aqi_sanfrancisco_ca.jpg"
             }[zip_code]
-            data = "<html><img src=\"{}\" width=\"525\" height=\"400\" border=\"0\" style=\"position:relative\" usemap=\"#CurMap\"/></html>".format(
-                map_url)
+            data = f"<html><img src=\"{map_url}\" width=\"525\" height=\"400\" border=\"0\" style=\"position:relative\" usemap=\"#CurMap\"/></html>"
 
             return (200, {}, data)
 

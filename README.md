@@ -1,10 +1,9 @@
 <p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://www.alexlaird.com/content/uploads/2020/09/logo-2.png" /></p>
 
-[![Build](https://github.com/alexdlaird/air-quality-bot/actions/workflows/build.yml/badge.svg)](https://github.com/alexdlaird/air-quality-bot/actions/workflows/build.yml)
-[![Codecov](https://codecov.io/gh/alexdlaird/air-quality-bot/branch/main/graph/badge.svg)](https://codecov.io/gh/alexdlaird/air-quality-bot)
 ![Python Versions](https://img.shields.io/badge/python-%203.8%20|%203.9%20|%203.10%20|%203.11%20-blue)
-![GitHub License](https://img.shields.io/github/license/alexdlaird/air-quality-bot)
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Text+your+zip+code+to+the+%23AirQualityBot+at+%28415%29+212-4229%2C+and+optionally+add+%E2%80%9Cmap%E2%80%9D%2C+and+it%E2%80%99ll+respond+with+the+current+%23airquality+for+your+region.%0D%0A%0D%0AStay+safe+everyone.%0D%0A%0D%0A&url=https://github.com/alexdlaird/air-quality-bot&via=alexdlaird+@twilio&hashtags=Twilio,TwilioFunctions,AirNow,AQI)
+[![Coverage](https://img.shields.io/codecov/c/github/alexdlaird/air-quality-bot)](https://codecov.io/gh/alexdlaird/air-quality-bot)
+[![Build](https://img.shields.io/github/actions/workflow/status/alexdlaird/air-quality-bot/build.yml)](https://github.com/alexdlaird/air-quality-bot/actions/workflows/build.yml)
+[![GitHub License](https://img.shields.io/github/license/alexdlaird/air-quality-bot)](https://github.com/alexdlaird/air-quality-bot/blob/main/LICENSE)
 
 The Air Quality Bot is generally available by texting a zip code (and optionally
 the word "map") to (415) 212-4229. The bot will respond with the latest air
@@ -154,6 +153,6 @@ can easily be redeployed at any time by rerunning the deploy script:
 
 If you would like to get involved, be sure to review the [Contribution Guide](https://github.com/alexdlaird/air-quality-bot/blob/main/CONTRIBUTING.rst).
 
-Want to contribute financially? If you've found `pyngrok` useful, [sponsorship](https://github.com/sponsors/alexdlaird) would
+Want to contribute financially? If you've found Air Quality Bot useful, [sponsorship](https://github.com/sponsors/alexdlaird) would
 also be greatly appreciated!
 

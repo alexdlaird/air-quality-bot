@@ -6,4 +6,4 @@ __version__ = "0.1.4"
 
 
 def increment(metric):
-    lambda_metric("airqualitybot.{}".format(metric), 1)
+    lambda_metric(f"airqualitybot.{metric}", 1)

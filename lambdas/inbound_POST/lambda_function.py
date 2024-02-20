@@ -31,10 +31,10 @@ logger.setLevel(logging.INFO)
 
 @conditional_decorator(datadog_lambda_wrapper, not os.environ.get("FLASK_APP", None))
 def lambda_handler(event, context):
-    logger.info("Event: {}".format(event))
+    logger.info(f"Event: {event}")
 
     query_string = event["params"]["querystring"]
-    logger.info("Query String: {}".format(query_string))
+    logger.info(f"Query String: {query_string}")
 
     metricutils.increment("inbound_POST.request")
 
@@ -42,7 +42,7 @@ def lambda_handler(event, context):
     phone_number = data["From"][0]
     body = data["Body"][0]
 
-    logger.info("Received \"{}\" from {}".format(body, phone_number))
+    logger.info(f"Received \"{body}\" from {phone_number}")
 
     zip_code = body.lower().strip()
     include_map = "map" in zip_code
@@ -61,8 +61,8 @@ def lambda_handler(event, context):
         zip_code = zip_code.split("map")[0].strip()
 
     try:
-        response = requests.get(
-            "{}/aqi?zipCode={}".format(AIR_QUALITY_API_URL, zip_code, timeout=_AIR_QUALITY_API_TIMEOUT)).json()
+        response = requests.get(f"{AIR_QUALITY_API_URL}/aqi?zipCode={zip_code}",
+                                timeout=_AIR_QUALITY_API_TIMEOUT).json()
     except requests.exceptions.RequestException as e:
         metricutils.increment("inbound_POST.error.aqi-request-failed")
         logger.error(e)
@@ -71,7 +71,7 @@ def lambda_handler(event, context):
             "errorMessage": "Oops, an unknown error occurred. AirNow may be overloaded at the moment."
         }
 
-    logger.info("Response from `/aqi`: {}".format(response))
+    logger.info(f"Response from `/aqi`: {response}")
 
     if "errorMessage" in response:
         return _get_response(response["errorMessage"])
@@ -95,19 +95,17 @@ def lambda_handler(event, context):
             response[parameter_name]["HourObserved"]
         time = str(int(12 if time == "00" else time)) + suffix + " " + response[parameter_name]["LocalTimeZone"]
 
-        msg = "{} AQI of {} {} for {} at {}. {}\nSource: AirNow".format(
-            response[parameter_name]["Category"]["Name"],
-            int(response[parameter_name]["AQI"]),
-            parameter_name,
-            response[parameter_name]["ReportingArea"], time,
-            _AQI_MESSAGES[
-                response[parameter_name]["Category"][
-                    "Name"]])
+        msg = "{category_name} AQI of {aqi} {param_name} for {reporting_area} at {time}. {category_name}\nSource: AirNow".format(
+            category_name=response[parameter_name]["Category"]["Name"],
+            aqi=int(response[parameter_name]["AQI"]),
+            param_name=parameter_name,
+            reporting_area=response[parameter_name]["ReportingArea"],
+            time=time)
 
         media = None
         if include_map:
             # if "MapUrl" in response[parameter_name]:
-            media = "https://gispub.epa.gov/airnow/images/current-pm-ozone.jpg" #response[parameter_name]["MapUrl"]
+            media = "https://gispub.epa.gov/airnow/images/current-pm-ozone.jpg"  # response[parameter_name]["MapUrl"]
             # else:
             #     metricutils.increment("inbound_POST.warn.map-request-failed")
             #     logger.info("Map requested but not included, no MapUrl provided from AirNow")
@@ -118,10 +116,9 @@ def lambda_handler(event, context):
 def _get_response(msg, media=None):
     media_block = ""
     if media is not None:
-        media_block = "<Media>{}</Media>".format(media)
+        media_block = f"<Media>{media}</Media>"
 
-    xml_response = "<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>{}</Body>{}</Message></Response>".format(
-        msg, media_block)
-    logger.info("XML response: {}".format(xml_response))
+    xml_response = f"<?xml version='1.0' encoding='UTF-8'?><Response><Message><Body>{msg}</Body>{media_block}</Message></Response>"
+    logger.info(f"XML response: {xml_response}")
 
     return {"body": xml_response}
