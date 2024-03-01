@@ -1,4 +1,4 @@
-<p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://www.alexlaird.com/content/uploads/2020/09/logo-2.png" /></p>
+<p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://raw.githubusercontent.com/alexdlaird/air-quality-bot/main/logo.png" /></p>
 
 ![Python Versions](https://img.shields.io/badge/python-%203.8%20|%203.9%20|%203.10%20|%203.11%20-blue)
 [![Coverage](https://img.shields.io/codecov/c/github/alexdlaird/air-quality-bot)](https://codecov.io/gh/alexdlaird/air-quality-bot)
