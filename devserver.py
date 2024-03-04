@@ -1,3 +1,6 @@
+__copyright__ = "Copyright (c) 2018-2019 Alex Laird"
+__license__ = "MIT"
+
 import json
 import os
 import sys
@@ -13,6 +16,8 @@ from moto import mock_dynamodb
 from pyngrok import ngrok
 from twilio.rest import Client
 
+from lambdas.aqi_GET import lambda_function as aqi_route
+from lambdas.inbound_POST import lambda_function as inbound_route
 from utils.jsonutils import decimal_default
 
 load_dotenv(dotenv_path=".env.dev")
@@ -43,13 +48,6 @@ dynamodb.create_table(
         "WriteCapacityUnits": 1
     }
 )
-
-from lambdas.aqi_GET import lambda_function as aqi_route
-from lambdas.inbound_POST import lambda_function as inbound_route
-
-__author__ = "Alex Laird"
-__copyright__ = "Copyright 2020, Alex Laird"
-__version__ = "1.0.0"
 
 LOGGING = {
     "version": 1,

@@ -1,15 +1,14 @@
+__copyright__ = "Copyright (c) 2018-2019 Alex Laird"
+__license__ = "MIT"
+
 import unittest
 from datetime import datetime, timedelta
 
 import responses
 from moto import mock_dynamodb
 
-from .testcase import TestCase
 from lambdas.aqi_GET import lambda_function
-
-__author__ = "Alex Laird"
-__copyright__ = "Copyright 2020, Alex Laird"
-__version__ = "1.0.0"
+from .testcase import TestCase
 
 
 class TestCaseAQI(TestCase):

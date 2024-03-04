@@ -1,3 +1,6 @@
+__copyright__ = "Copyright (c) 2018-2019 Alex Laird"
+__license__ = "MIT"
+
 import unittest
 
 import responses
@@ -5,10 +8,6 @@ from moto import mock_dynamodb
 
 from lambdas.inbound_POST import lambda_function
 from .testcase import TestCase
-
-__author__ = "Alex Laird"
-__copyright__ = "Copyright 2020, Alex Laird"
-__version__ = "1.0.0"
 
 
 class TestCaseInbound(TestCase):

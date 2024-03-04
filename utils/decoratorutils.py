@@ -1,6 +1,5 @@
-__author__ = "Alex Laird"
-__copyright__ = "Copyright 2020, Alex Laird"
-__version__ = "0.1.5"
+__copyright__ = "Copyright (c) 2018-2019 Alex Laird"
+__license__ = "MIT"
 
 
 def conditional_decorator(dec, condition):

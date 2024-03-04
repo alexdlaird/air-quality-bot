@@ -1,8 +1,7 @@
-from datadog import lambda_metric
+__copyright__ = "Copyright (c) 2018-2019 Alex Laird"
+__license__ = "MIT"
 
-__author__ = "Alex Laird"
-__copyright__ = "Copyright 2020, Alex Laird"
-__version__ = "0.1.4"
+from datadog import lambda_metric
 
 
 def increment(metric):

@@ -1,3 +1,6 @@
+__copyright__ = "Copyright (c) 2018-2019 Alex Laird"
+__license__ = "MIT"
+
 import json
 import logging
 import os
@@ -13,10 +16,6 @@ from dateutil import parser
 
 from utils import metricutils
 from utils.decoratorutils import conditional_decorator
-
-__author__ = "Alex Laird"
-__copyright__ = "Copyright 2020, Alex Laird"
-__version__ = "1.0.0"
 
 DYNAMODB_REGION = os.environ.get("DYNAMODB_REGION")
 DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT")
