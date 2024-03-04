@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 import responses
 from moto import mock_dynamodb
 
-from lambdas.aqi_GET import lambda_function
 from .testcase import TestCase
+from lambdas.aqi_GET import lambda_function
 
 
 class TestCaseAQI(TestCase):

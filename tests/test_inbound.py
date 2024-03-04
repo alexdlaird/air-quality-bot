@@ -6,8 +6,8 @@ import unittest
 import responses
 from moto import mock_dynamodb
 
-from lambdas.inbound_POST import lambda_function
 from .testcase import TestCase
+from lambdas.inbound_POST import lambda_function
 
 
 class TestCaseInbound(TestCase):
