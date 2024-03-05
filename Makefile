@@ -31,8 +31,7 @@ clean: nopyc
 test: install
 	@( \
 		source .venv/bin/activate; \
-		coverage run -m unittest discover -v -b; \
-		coverage report && coverage xml && coverage html; \
+		coverage run -m unittest discover -v -b && coverage report && coverage xml && coverage html; \
 	)
 
 run-devserver: install
