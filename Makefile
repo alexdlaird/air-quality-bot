@@ -26,12 +26,13 @@ nopyc:
 	find . -name __pycache__ | xargs rm -rf || true
 
 clean: nopyc
-	rm -rf _build .venv
+	rm -rf build .venv
 
 test: install
 	@( \
 		source .venv/bin/activate; \
-		python -m coverage run -m unittest discover -v -b && python -m coverage xml -o _build/coverage/coverage.xml; \
+		coverage run -m unittest discover -v -b; \
+		coverage report && coverage xml && coverage html; \
 	)
 
 run-devserver: install
