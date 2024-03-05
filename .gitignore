@@ -7,5 +7,4 @@
 .env.dev
 lib
 build
-_build
 .coverage

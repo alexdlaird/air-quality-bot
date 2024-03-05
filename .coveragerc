@@ -17,6 +17,9 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
 
+[xml]
+output = build/coverage/coverage.xml
+
 [html]
 title = air-quality-bot Coverage Report
-directory = _build/coverage
+directory = build/coverage

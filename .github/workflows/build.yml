@@ -40,7 +40,7 @@ jobs:
         if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v1
         with:
-          directory: ./_build/coverage
+          directory: ./build/coverage
 
   automerge:
     name: "Auto Approve"
