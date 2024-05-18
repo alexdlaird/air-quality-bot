@@ -41,18 +41,3 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           directory: ./build/coverage
-
-  automerge:
-    name: "Auto Approve"
-    needs: build
-    runs-on: ubuntu-latest
-
-    permissions:
-      pull-requests: write
-      contents: write
-
-    steps:
-      - uses: fastify/github-action-merge-dependabot@v3
-        with:
-          target: major
-          use-github-auto-merge: true
