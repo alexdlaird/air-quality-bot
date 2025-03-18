@@ -7,3 +7,5 @@ updates:
     day: "monday"
     time: "05:00"
     timezone: "America/Chicago"
+  # Project not actively developed, so only open security updates: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#open-pull-requests-limit
+  - open-pull-requests-limit: 0
