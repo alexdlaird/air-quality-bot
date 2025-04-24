@@ -7,8 +7,6 @@ updates:
     day: "monday"
     time: "05:00"
     timezone: "America/Chicago"
-  # Project not actively developed, so only allow security updates and personal projects
-  ignore:
-    - dependency-name: "*"
+  # Project not actively developed, so only allow security updates and certain projects
   allow:
     - dependency-name: "pyngrok"
