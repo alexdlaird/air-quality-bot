@@ -107,10 +107,10 @@ if USE_NGROK:
 
 
 ###################################################################################
-# Above has been initialization of the dev environment, ensuring we have everything
-# we need mocked out, in memory, and configured to run the service locally.
+# Above has been initialization of the dev environment, ensuring everything has
+# been mocked out (in memory) and configured to run the service locally.
 #
-# Below are our Flask routes, which simply emulate the AWS API Gateway behavior
+# Below are the Flask routes, which simply emulate the AWS API Gateway behavior
 # of taking a request, parsing it, and passing it as the context to the right
 # Lambda function.
 ###################################################################################

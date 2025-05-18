@@ -94,7 +94,7 @@ Additionally, create the following "Resource" paths:
 
 Under each of the above, do the following:
 
-- Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `AirQuality_<ROUTE_NAME>_GET`, where <ROUTE_NAME> corresponds to the name of the Lambda we created
+- Create a new "GET" method with the "Integration type" of "Lambda Function" and point it to the Lambda `AirQuality_<ROUTE_NAME>_GET`, where <ROUTE_NAME> corresponds to the name of the Lambda you created
 to execute on this method
   - Edit the "GET" method's "Method Request"
     - Change the "Request Validator" to "Validate query string parameters and header"
