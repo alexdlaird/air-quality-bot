@@ -1,6 +1,6 @@
 <p align="center"><img alt="Air Quality Bot - Text (415) 212-4229" src="https://raw.githubusercontent.com/alexdlaird/air-quality-bot/main/logo.png" /></p>
 
-![Python Versions](https://img.shields.io/badge/python-%203.8%20|%203.9%20|%203.10%20|%203.11%20-blue)
+![Python Versions](https://img.shields.io/badge/python-%203.9%20|%203.10%20|%203.11%20-blue)
 [![Coverage](https://img.shields.io/codecov/c/github/alexdlaird/air-quality-bot)](https://codecov.io/gh/alexdlaird/air-quality-bot)
 [![Build](https://img.shields.io/github/actions/workflow/status/alexdlaird/air-quality-bot/build.yml)](https://github.com/alexdlaird/air-quality-bot/actions/workflows/build.yml)
 [![GitHub License](https://img.shields.io/github/license/alexdlaird/air-quality-bot)](https://github.com/alexdlaird/air-quality-bot/blob/main/LICENSE)
