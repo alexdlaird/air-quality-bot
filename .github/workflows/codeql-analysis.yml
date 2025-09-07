@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  security-events: write
+  contents: read
+  actions: read
+  issues: none
+  pull-requests: none
+
 jobs:
   analyse:
     name: Analyse
