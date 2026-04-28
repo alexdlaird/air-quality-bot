@@ -1,6 +1,6 @@
 moto==4.2.11
 responses==0.24.1
-pyngrok==8.1.0
+pyngrok==8.1.1
 twilio
 python-dotenv
 flask
