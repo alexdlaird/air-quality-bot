@@ -90,7 +90,7 @@ if USE_NGROK:
     port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 5000
 
     # Open a ngrok tunnel to the dev server
-    public_url = ngrok.connect(port)
+    public_url = ngrok.connect(port).public_url
     print(f" * ngrok tunnel \"{public_url}\" -> \"http://127.0.0.1:{port}/\"")
 
     TWILIO_ACCOUNT_SID = os.environ.get("AIR_QUALITY_DEV_TWILIO_ACCOUNT_SID", None)
